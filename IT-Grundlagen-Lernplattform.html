@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT-Grundlagen – Lernplattform</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d0f14;
+  --bg2:       #13161e;
+  --bg3:       #1a1e28;
+  --border:    #252a38;
+  --text:      #e8ecf4;
+  --muted:     #6b7694;
+  --accent:    #4f8ef7;
+  --accent2:   #f7c04f;
+  --accent3:   #4ff7b0;
+  --danger:    #f74f4f;
+  --success:   #4ff77a;
+  --card-r:    12px;
+  --font-mono: 'Space Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
+  --font-disp: 'DM Serif Display', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,15,20,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; gap: 0;
+  height: 60px;
+}
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: auto;
+  white-space: nowrap;
+}
+.nav-logo span { color: var(--accent2); }
+.nav-tabs {
+  display: flex; gap: 2px;
+}
+.nav-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all 0.2s;
+  border: none; background: none;
+  white-space: nowrap;
+}
+.nav-tab:hover { color: var(--text); background: var(--bg3); }
+.nav-tab.active { color: var(--accent); background: rgba(79,142,247,0.12); }
+.nav-progress {
+  margin-left: 1.5rem;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+}
+.progress-ring { width: 32px; height: 32px; transform: rotate(-90deg); }
+.progress-ring circle { fill: none; stroke-width: 3; }
+.progress-ring .bg { stroke: var(--border); }
+.progress-ring .fg { stroke: var(--accent3); stroke-dasharray: 82; stroke-dashoffset: 82; transition: stroke-dashoffset 0.6s ease; stroke-linecap: round; }
+
+/* ── PAGES ── */
+.page { display: none; min-height: calc(100vh - 60px); }
+.page.active { display: block; }
+
+/* ── HERO ── */
+.hero {
+  padding: 80px 2rem 60px;
+  max-width: 900px; margin: 0 auto;
+  position: relative;
+}
+.hero-tag {
+  display: inline-block;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--accent3); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 20px;
+  border: 1px solid rgba(79,247,176,0.3);
+  padding: 4px 12px; border-radius: 100px;
+}
+.hero h1 {
+  font-family: var(--font-disp);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { color: var(--muted); font-size: 16px; max-width: 560px; margin-bottom: 40px; }
+
+.stats-row {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 50px;
+}
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 20px 28px;
+  min-width: 140px;
+}
+.stat-card .val {
+  font-family: var(--font-mono); font-size: 28px;
+  color: var(--accent2); display: block;
+}
+.stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.chapter-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 18px 20px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 14px;
+}
+.chapter-card:hover { border-color: var(--accent); transform: translateY(-2px); background: var(--bg3); }
+.chapter-num {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--accent); background: rgba(79,142,247,0.1);
+  border: 1px solid rgba(79,142,247,0.25);
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.chapter-info .title { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.chapter-info .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.chapter-done { margin-left: auto; color: var(--accent3); font-size: 14px; opacity: 0; transition: opacity 0.3s; }
+.chapter-card.done .chapter-done { opacity: 1; }
+
+/* ── FLASHCARDS ── */
+.fc-layout {
+  max-width: 800px; margin: 0 auto; padding: 40px 2rem;
+}
+.fc-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 30px; flex-wrap: wrap;
+}
+.fc-header h2 { font-family: var(--font-disp); font-size: 1.8rem; }
+.fc-filter {
+  margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border);
+  background: none; color: var(--muted); font-size: 12px; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+}
+.filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
+
+.fc-progress-bar {
+  height: 3px; background: var(--border); border-radius: 2px;
+  margin-bottom: 24px; overflow: hidden;
+}
+.fc-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 2px; transition: width 0.4s ease;
+}
+
+.card-counter {
+  text-align: center; font-family: var(--font-mono);
+  font-size: 12px; color: var(--muted); margin-bottom: 20px;
+}
+
+.flashcard-wrap {
+  perspective: 1200px; height: 300px; cursor: pointer;
+  margin-bottom: 24px;
+}
+.flashcard {
+  width: 100%; height: 100%;
+  position: relative; transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  border-radius: 16px;
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.fc-front, .fc-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; border-radius: 16px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px; text-align: center;
+  border: 1px solid var(--border);
+}
+.fc-front {
+  background: var(--bg2);
+}
+.fc-back {
+  background: linear-gradient(135deg, #0f1729 0%, #1a1e28 100%);
+  border-color: rgba(79,142,247,0.35);
+  transform: rotateY(180deg);
+}
+.fc-front .category {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.fc-front .question {
+  font-size: 18px; font-weight: 500; line-height: 1.45;
+  color: var(--text);
+}
+.fc-back .answer {
+  font-size: 15px; line-height: 1.65; color: var(--text);
+}
+.fc-back .answer strong { color: var(--accent3); }
+.fc-hint {
+  margin-top: 16px; font-size: 12px; color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.fc-controls {
+  display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+}
+.fc-btn {
+  padding: 10px 24px; border-radius: 100px; border: 1px solid;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+}
+.fc-btn.prev  { border-color: var(--border); color: var(--muted); background: none; }
+.fc-btn.prev:hover { border-color: var(--text); color: var(--text); }
+.fc-btn.flip  { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.1); }
+.fc-btn.flip:hover { background: rgba(79,142,247,0.2); }
+.fc-btn.next  { border-color: var(--accent3); color: var(--accent3); background: rgba(79,247,176,0.08); }
+.fc-btn.next:hover { background: rgba(79,247,176,0.16); }
+.fc-btn.knew  { border-color: var(--success); color: var(--success); background: rgba(79,247,122,0.08); }
+.fc-btn.knew:hover { background: rgba(79,247,122,0.16); }
+.fc-btn.shuffle { border-color: var(--accent2); color: var(--accent2); background: rgba(247,192,79,0.08); }
+.fc-btn.shuffle:hover { background: rgba(247,192,79,0.16); }
+
+.fc-score {
+  text-align: center; margin-top: 16px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+}
+.fc-score span { color: var(--accent3); }
+
+/* ── QUIZ ── */
+.quiz-layout {
+  max-width: 720px; margin: 0 auto; padding: 40px 2rem;
+}
+.quiz-header { margin-bottom: 32px; }
+.quiz-header h2 { font-family: var(--font-disp); font-size: 1.8rem; margin-bottom: 8px; }
+.quiz-header p { color: var(--muted); }
+
+.quiz-config {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 28px; margin-bottom: 24px;
+  display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;
+}
+.config-group { display: flex; flex-direction: column; gap: 6px; }
+.config-group label { font-size: 12px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.config-select {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding: 8px 14px; border-radius: 8px;
+  font-family: var(--font-body); font-size: 14px; cursor: pointer;
+}
+.config-select:focus { outline: none; border-color: var(--accent); }
+.btn-generate {
+  padding: 10px 24px; background: var(--accent);
+  color: #fff; border: none; border-radius: 100px;
+  font-weight: 600; font-size: 14px; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+  margin-left: auto;
+}
+.btn-generate:hover { background: #6fa4f9; transform: translateY(-1px); }
+
+.quiz-question {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px; margin-bottom: 16px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+.q-meta {
+  display: flex; gap: 10px; margin-bottom: 20px;
+}
+.q-type-badge {
+  font-family: var(--font-mono); font-size: 10px;
+  padding: 3px 10px; border-radius: 100px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.badge-mc   { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+.badge-tf   { background: rgba(247,192,79,0.15); color: var(--accent2); border: 1px solid rgba(247,192,79,0.3); }
+.badge-fill { background: rgba(79,247,176,0.15); color: var(--accent3); border: 1px solid rgba(79,247,176,0.3); }
+.badge-subnet { background: rgba(247,79,79,0.15); color: var(--danger); border: 1px solid rgba(247,79,79,0.3); }
+.q-diff {
+  font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; gap: 4px;
+}
+
+.q-text { font-size: 17px; font-weight: 500; line-height: 1.5; margin-bottom: 24px; }
+
+.q-options { display: flex; flex-direction: column; gap: 10px; }
+.q-option {
+  padding: 14px 18px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg3);
+  cursor: pointer; transition: all 0.18s;
+  font-size: 14px; display: flex; align-items: center; gap: 12px;
+}
+.q-option:hover:not(.disabled) { border-color: var(--accent); background: rgba(79,142,247,0.06); }
+.q-option.correct { border-color: var(--success); background: rgba(79,247,122,0.08); color: var(--success); }
+.q-option.wrong   { border-color: var(--danger);  background: rgba(247,79,79,0.08);   color: var(--danger); }
+.q-option.disabled { cursor: default; }
+.opt-letter {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 1px solid var(--border); display: flex;
+  align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; flex-shrink: 0;
+}
+
+.q-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding: 12px 16px; border-radius: 10px;
+  font-size: 15px; font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+.q-input:focus { outline: none; border-color: var(--accent); }
+.q-input.correct { border-color: var(--success); }
+.q-input.wrong   { border-color: var(--danger); }
+
+.q-explanation {
+  margin-top: 16px; padding: 14px 18px;
+  background: rgba(79,142,247,0.07); border: 1px solid rgba(79,142,247,0.2);
+  border-radius: 10px; font-size: 13px; color: var(--muted); line-height: 1.6;
+  display: none;
+}
+.q-explanation.show { display: block; animation: slideIn 0.2s ease; }
+.q-explanation strong { color: var(--accent); }
+
+.q-check {
+  margin-top: 20px;
+  padding: 11px 28px; background: var(--accent);
+  color: #fff; border: none; border-radius: 100px;
+  font-weight: 600; font-size: 14px; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+}
+.q-check:hover { background: #6fa4f9; }
+.q-check:disabled { opacity: 0.4; cursor: default; }
+
+.quiz-score-panel {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px; text-align: center;
+  display: none;
+}
+.quiz-score-panel.show { display: block; animation: slideIn 0.4s ease; }
+.score-big {
+  font-family: var(--font-mono); font-size: 64px;
+  font-weight: 700; margin-bottom: 8px;
+}
+.score-big.great { color: var(--success); }
+.score-big.ok    { color: var(--accent2); }
+.score-big.poor  { color: var(--danger); }
+.score-msg { font-size: 18px; margin-bottom: 24px; }
+.btn-retry {
+  padding: 11px 32px; border: 1px solid var(--accent3);
+  color: var(--accent3); background: rgba(79,247,176,0.08);
+  border-radius: 100px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
+}
+.btn-retry:hover { background: rgba(79,247,176,0.16); }
+
+/* ── LERNPFAD ── */
+.path-layout {
+  max-width: 860px; margin: 0 auto; padding: 40px 2rem;
+}
+.path-header { margin-bottom: 32px; }
+.path-header h2 { font-family: var(--font-disp); font-size: 1.8rem; margin-bottom: 6px; }
+.path-header p  { color: var(--muted); }
+
+.path-steps { display: flex; flex-direction: column; gap: 0; }
+.path-step {
+  display: grid; grid-template-columns: 56px 1fr;
+  gap: 0; position: relative;
+}
+.path-step::before {
+  content: '';
+  position: absolute; left: 27px; top: 56px; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.path-step:last-child::before { display: none; }
+.step-node {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg2); display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--muted); position: relative; z-index: 1; flex-shrink: 0;
+  transition: all 0.3s; cursor: pointer;
+}
+.path-step.done .step-node { border-color: var(--accent3); color: var(--accent3); background: rgba(79,247,176,0.08); }
+.path-step.active .step-node { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.12); box-shadow: 0 0 0 4px rgba(79,142,247,0.15); }
+.step-content {
+  padding: 0 0 32px 20px;
+}
+.step-label {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;
+}
+.step-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 12px; }
+.step-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.step-tag {
+  font-size: 11px; padding: 3px 10px; border-radius: 100px;
+  border: 1px solid var(--border); color: var(--muted);
+}
+.step-action {
+  margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--accent); cursor: pointer;
+  text-decoration: none; font-weight: 500;
+}
+.step-action:hover { color: var(--accent3); }
+.path-step.done .step-action { color: var(--accent3); }
+
+/* ── REFERENZ ── */
+.ref-layout {
+  max-width: 1000px; margin: 0 auto; padding: 40px 2rem;
+}
+.ref-header { margin-bottom: 32px; }
+.ref-header h2 { font-family: var(--font-disp); font-size: 1.8rem; margin-bottom: 6px; }
+
+.ref-search-wrap { position: relative; margin-bottom: 24px; }
+.ref-search {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border);
+  color: var(--text); padding: 12px 16px 12px 42px; border-radius: 10px;
+  font-size: 14px; font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+.ref-search:focus { outline: none; border-color: var(--accent); }
+.ref-search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 16px; pointer-events: none;
+}
+
+.ref-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.ref-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 18px 20px;
+  transition: border-color 0.2s;
+}
+.ref-card:hover { border-color: var(--border); }
+.ref-term {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--accent2); font-weight: 700; margin-bottom: 6px;
+}
+.ref-def { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.ref-def strong { color: var(--text); }
+.ref-tag {
+  display: inline-block; margin-top: 8px;
+  font-size: 10px; padding: 2px 8px; border-radius: 100px;
+  border: 1px solid var(--border); color: var(--muted);
+  font-family: var(--font-mono); letter-spacing: 0.06em;
+}
+.ref-hidden { display: none !important; }
+
+/* ── TABLES IN FLASHCARDS/QUIZ ── */
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 8px 0; }
+th { background: var(--bg3); padding: 7px 12px; text-align: left; font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 0.06em; border: 1px solid var(--border); }
+td { padding: 7px 12px; border: 1px solid var(--border); vertical-align: top; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+code { font-family: var(--font-mono); font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: var(--accent3); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .nav-logo { font-size: 11px; }
+  .nav-tab { padding: 6px 10px; font-size: 12px; }
+  .hero, .fc-layout, .quiz-layout, .path-layout, .ref-layout { padding: 24px 1rem; }
+  .flashcard-wrap { height: 260px; }
+  .fc-front .question { font-size: 15px; }
+  .quiz-config { flex-direction: column; }
+  .btn-generate { margin-left: 0; }
+}
+
+/* ── SPACED REPETITION (Leitner) ── */
+.leitner-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-bottom: 12px;
+}
+.l-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--border); transition: background 0.3s;
+}
+.l-dot.l1 { background: var(--danger); }
+.l-dot.l2 { background: var(--accent2); }
+.l-dot.l3 { background: var(--accent); }
+.l-dot.l4 { background: var(--accent3); }
+.l-dot.l5 { background: #9f7aea; }
+.l-label {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); letter-spacing: 0.06em;
+}
+.leitner-panel {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 18px 20px; margin-top: 20px;
+}
+.leitner-panel-title {
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.leitner-boxes { display: flex; gap: 10px; flex-wrap: wrap; }
+.lbox {
+  flex: 1; min-width: 56px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 8px; text-align: center;
+}
+.lbox-num {
+  font-family: var(--font-mono); font-size: 22px;
+  font-weight: 700; display: block; margin-bottom: 3px;
+}
+.lbox-lbl { font-size: 10px; color: var(--muted); }
+.lbox.lb1 .lbox-num { color: var(--danger); }
+.lbox.lb2 .lbox-num { color: var(--accent2); }
+.lbox.lb3 .lbox-num { color: var(--accent); }
+.lbox.lb4 .lbox-num { color: var(--accent3); }
+.lbox.lb5 .lbox-num { color: #9f7aea; }
+.fc-btn.nope {
+  border-color: var(--danger); color: var(--danger);
+  background: rgba(247,79,79,0.08);
+}
+.fc-btn.nope:hover { background: rgba(247,79,79,0.16); }
+
+/* ── FEHLER-STAPEL ── */
+.error-banner {
+  background: rgba(247,79,79,0.07);
+  border: 1px solid rgba(247,79,79,0.28);
+  border-radius: var(--card-r); padding: 14px 20px;
+  margin-bottom: 20px;
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.error-banner p { font-size: 13px; line-height: 1.5; }
+.error-banner strong { color: var(--danger); }
+.btn-error-stack {
+  padding: 8px 18px;
+  border: 1px solid var(--danger); color: var(--danger);
+  background: rgba(247,79,79,0.1); border-radius: 100px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+  white-space: nowrap; flex-shrink: 0;
+}
+.btn-error-stack:hover { background: rgba(247,79,79,0.2); }
+.btn-retry-errors {
+  padding: 11px 28px;
+  border: 1px solid var(--danger); color: var(--danger);
+  background: rgba(247,79,79,0.08); border-radius: 100px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+}
+.btn-retry-errors:hover { background: rgba(247,79,79,0.16); }
+
+/* ── DRUCKMODUS ── */
+.print-layout {
+  max-width: 820px; margin: 0 auto; padding: 40px 2rem;
+}
+.print-header { margin-bottom: 28px; }
+.print-header h2 { font-family: var(--font-disp); font-size: 1.8rem; margin-bottom: 6px; }
+.print-header p { color: var(--muted); font-size: 13px; }
+.print-config {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--card-r); padding: 22px 24px;
+  margin-bottom: 24px;
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end;
+}
+.btn-print {
+  padding: 10px 24px; background: var(--accent3);
+  color: var(--bg); border: none; border-radius: 100px;
+  font-weight: 700; font-size: 14px; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font-body);
+  margin-left: auto;
+}
+.btn-print:hover { opacity: 0.85; transform: translateY(-1px); }
+.print-preview-label {
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.print-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.print-card {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; background: var(--bg3); break-inside: avoid;
+}
+.print-card .p-cat {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--accent2); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 6px;
+}
+.print-card .p-q {
+  font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 8px;
+}
+.print-card .p-sep {
+  border: none; border-top: 1px dashed var(--border); margin: 8px 0;
+}
+.print-card .p-a {
+  font-size: 11px; color: var(--muted); line-height: 1.5;
+}
+
+@media print {
+  nav, .print-config, .page:not(#page-print) { display: none !important; }
+  body { background: #fff; color: #111; }
+  .page#page-print { display: block !important; }
+  .print-layout { padding: 0; max-width: 100%; }
+  .print-header h2 { color: #111; }
+  .print-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .print-card { border-color: #ccc; background: #fafafa; }
+  .print-card .p-cat { color: #888; }
+  .print-card .p-q { color: #111; }
+  .print-card .p-sep { border-color: #ccc; }
+  .print-card .p-a { color: #444; }
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 20px;
+  font-size: 13px; color: var(--text);
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: var(--success); color: var(--success); }
+.toast.error   { border-color: var(--danger);  color: var(--danger); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">IT<span>·</span>Grundlagen</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('overview')">Übersicht</button>
+    <button class="nav-tab" onclick="showPage('flashcards')">Karteikarten</button>
+    <button class="nav-tab" onclick="showPage('quiz')">Aufgaben</button>
+    <button class="nav-tab" onclick="showPage('path')">Lernpfad</button>
+    <button class="nav-tab" onclick="showPage('ref')">Glossar</button>
+    <button class="nav-tab" onclick="showPage('print')">🖨 Drucken</button>
+  </div>
+  <div class="nav-progress">
+    <svg class="progress-ring" viewBox="0 0 32 32">
+      <circle class="bg" cx="16" cy="16" r="13"/>
+      <circle class="fg" id="progressRing" cx="16" cy="16" r="13"/>
+    </svg>
+    <span id="progressLabel">0%</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: OVERVIEW
+══════════════════════════════════════════════════ -->
+<div class="page active" id="page-overview">
+  <div class="hero">
+    <div class="hero-tag">✦ IT-Grundlagen · Lernplattform</div>
+    <h1>Lerne IT von Grund auf – <em>strukturiert</em> und interaktiv.</h1>
+    <p>Karteikarten, Aufgabengenerator, Lernpfad und Glossar für alle 19 Themengebiete.</p>
+    <div class="stats-row">
+      <div class="stat-card"><span class="val">19</span><div class="lbl">Kapitel</div></div>
+      <div class="stat-card"><span class="val" id="statCards">80+</span><div class="lbl">Karteikarten</div></div>
+      <div class="stat-card"><span class="val">200+</span><div class="lbl">Übungsaufgaben</div></div>
+      <div class="stat-card"><span class="val" id="statKnown">0</span><div class="lbl">Karten gelernt</div></div>
+    </div>
+    <div class="chapter-grid" id="chapterGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: FLASHCARDS
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-flashcards">
+  <div class="fc-layout">
+    <div class="fc-header">
+      <div>
+        <h2>Karteikarten</h2>
+        <p style="color:var(--muted);font-size:13px;margin-top:4px;">✓ Gewusst rückt die Karte vor · ✗ Nochmal schickt sie zurück in Fach 1</p>
+      </div>
+      <div class="fc-filter" id="fcFilter"></div>
+    </div>
+    <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+    <div class="card-counter" id="cardCounter">Karte 1 von 1</div>
+    <div class="flashcard-wrap" onclick="flipCard()">
+      <div class="flashcard" id="flashcard">
+        <div class="fc-front">
+          <div class="leitner-row">
+            <div id="leitnerDots" class="leitner-row" style="margin:0"></div>
+            <span class="l-label" id="leitnerLabel"></span>
+          </div>
+          <div class="category" id="fcCategory">–</div>
+          <div class="question" id="fcQuestion">Lade Karten…</div>
+          <div class="fc-hint">← klicken zum Umdrehen →</div>
+        </div>
+        <div class="fc-back">
+          <div class="answer" id="fcAnswer">–</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-controls">
+      <button class="fc-btn prev"    onclick="fcNav(-1)">← Zurück</button>
+      <button class="fc-btn flip"    onclick="flipCard()">Umdrehen</button>
+      <button class="fc-btn nope"    onclick="markNope()">✗ Nochmal</button>
+      <button class="fc-btn knew"    onclick="markKnown()">✓ Gewusst</button>
+      <button class="fc-btn next"    onclick="fcNav(1)">Weiter →</button>
+      <button class="fc-btn shuffle" onclick="shuffleCards()">⇄ Mischen</button>
+    </div>
+    <div class="fc-score">Gelernt: <span id="fcKnown">0</span> / <span id="fcTotal">0</span></div>
+    <div class="leitner-panel">
+      <div class="leitner-panel-title">Leitner-System · Fach-Übersicht</div>
+      <div class="leitner-boxes">
+        <div class="lbox lb1"><span class="lbox-num" id="lbn1">0</span><div class="lbox-lbl">Fach 1</div></div>
+        <div class="lbox lb2"><span class="lbox-num" id="lbn2">0</span><div class="lbox-lbl">Fach 2</div></div>
+        <div class="lbox lb3"><span class="lbox-num" id="lbn3">0</span><div class="lbox-lbl">Fach 3</div></div>
+        <div class="lbox lb4"><span class="lbox-num" id="lbn4">0</span><div class="lbox-lbl">Fach 4</div></div>
+        <div class="lbox lb5"><span class="lbox-num" id="lbn5">0</span><div class="lbox-lbl">Gelernt ✓</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: QUIZ / AUFGABENGENERATOR
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-quiz">
+  <div class="quiz-layout">
+    <div class="quiz-header">
+      <h2>Aufgabengenerator</h2>
+      <p>Zufällige Übungsaufgaben – Multiple Choice, Wahr/Falsch, Lückentext & Subnetting</p>
+    </div>
+    <div id="errorBanner" style="display:none" class="error-banner">
+      <p>Du hattest zuletzt <strong id="errorCount">0</strong> falsche Antworten. Den <strong>Fehler-Stapel</strong> nochmal üben?</p>
+      <button class="btn-error-stack" onclick="loadErrorStack()">Fehler-Stapel üben →</button>
+    </div>
+    <div class="quiz-config">
+      <div class="config-group">
+        <label>Thema</label>
+        <select class="config-select" id="quizTopic">
+          <option value="all">Alle Themen</option>
+          <option value="Grundlagen">Grundlagen & Hardware</option>
+          <option value="Netzwerk">Netzwerke & Protokolle</option>
+          <option value="Schnittstellen">Schnittstellen & Busse</option>
+          <option value="Subnetting">Subnetting & IP</option>
+          <option value="Sicherheit">Sicherheit & Virtualisierung</option>
+          <option value="WLAN">WLAN & Funk</option>
+          <option value="Dateisysteme">Dateisysteme</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Aufgabentyp</label>
+        <select class="config-select" id="quizType">
+          <option value="all">Gemischt</option>
+          <option value="mc">Multiple Choice</option>
+          <option value="tf">Wahr / Falsch</option>
+          <option value="fill">Lückentext</option>
+          <option value="subnet">Subnetting-Rechnung</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Anzahl</label>
+        <select class="config-select" id="quizCount">
+          <option value="5">5 Aufgaben</option>
+          <option value="10" selected>10 Aufgaben</option>
+          <option value="20">20 Aufgaben</option>
+          <option value="all">Alle</option>
+        </select>
+      </div>
+      <button class="btn-generate" onclick="generateQuiz()">▶ Generieren</button>
+    </div>
+    <div id="quizContainer"></div>
+    <div class="quiz-score-panel" id="scorePanel">
+      <div class="score-big" id="scoreBig">–</div>
+      <div class="score-msg" id="scoreMsg">–</div>
+      <button class="btn-retry" onclick="generateQuiz()">Neue Aufgaben generieren</button>
+      <button class="btn-retry-errors" id="btnRetryErrors" style="display:none" onclick="loadErrorStack()">✗ Fehler wiederholen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: DRUCKMODUS
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-print">
+  <div class="print-layout">
+    <div class="print-header">
+      <h2>🖨 Druckmodus</h2>
+      <p>Karteikarten als PDF exportieren oder direkt drucken – Browser-Druckdialog öffnen mit Strg+P / ⌘+P</p>
+    </div>
+    <div class="print-config">
+      <div class="config-group">
+        <label style="font-size:12px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px">Kategorie</label>
+        <select class="config-select" id="printCat" onchange="renderPrintPreview()">
+          <option value="all">Alle Kategorien</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label style="font-size:12px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px">Antworten</label>
+        <select class="config-select" id="printAns" onchange="renderPrintPreview()">
+          <option value="0">Nur Fragen</option>
+          <option value="1">Fragen + Antworten</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label style="font-size:12px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px">Filter</label>
+        <select class="config-select" id="printFilter" onchange="renderPrintPreview()">
+          <option value="all">Alle Karten</option>
+          <option value="weak">Nur Fach 1 &amp; 2 (schwach)</option>
+        </select>
+      </div>
+      <button class="btn-print" onclick="window.print()">Drucken / Als PDF speichern</button>
+    </div>
+    <div class="print-preview-label" id="printLabel">0 Karten ausgewählt</div>
+    <div class="print-grid" id="printGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-path">
+  <div class="path-layout">
+    <div class="path-header">
+      <h2>Empfohlener Lernpfad</h2>
+      <p>Von den Grundlagen bis zu fortgeschrittenen Netzwerkthemen – Schritt für Schritt.</p>
+    </div>
+    <div class="path-steps" id="pathSteps"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: GLOSSAR / REFERENZ
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-ref">
+  <div class="ref-layout">
+    <div class="ref-header">
+      <h2>Glossar & Schnellreferenz</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">Alle Fachbegriffe auf einen Blick</p>
+    </div>
+    <div class="ref-search-wrap">
+      <span class="ref-search-icon">🔍</span>
+      <input class="ref-search" type="text" placeholder="Begriff suchen…" oninput="filterGlossary(this.value)" id="refSearch">
+    </div>
+    <div class="ref-grid" id="refGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════ */
+
+const CHAPTERS = [
+  { num:'01', title:'Grundlagen der Datendarstellung', sub:'Bit, Byte, SI- & Binär-Präfixe, Hertz' },
+  { num:'02', title:'Strom & Stromversorgung', sub:'Gleichstrom, Netzteil, PSU' },
+  { num:'03', title:'EVA-Prinzip (IPO)', sub:'Eingabe, Verarbeitung, Ausgabe' },
+  { num:'04', title:'Halbleiter, Transistoren & Prozessoren', sub:'CPU, Cache, Sockel, Architekturen' },
+  { num:'05', title:'Massenspeicher', sub:'HDD, SSD, Floppy, optische Medien' },
+  { num:'06', title:'Schnittstellen & Busse', sub:'USB, SATA, PCIe, M.2, NVMe' },
+  { num:'07', title:'BIOS & UEFI', sub:'Firmware, Bootstrapping, CMOS' },
+  { num:'08', title:'Arbeitsspeicher (RAM)', sub:'DDR-SDRAM, DIMM, Takt' },
+  { num:'09', title:'CPU-Kühlung', sub:'Kühlkörper, Wärmeleitpaste, AIO' },
+  { num:'10', title:'OSI-Referenzmodell', sub:'7 Schichten, Protokolle' },
+  { num:'11', title:'Netzwerk-Grundlagen', sub:'NIC, Ethernet, MAC, IPv4, DHCP, DNS' },
+  { num:'12', title:'Protokolle & Dienste', sub:'TCP, UDP, HTTP, DSL, Glasfaser' },
+  { num:'13', title:'IT-Sicherheit & Virtualisierung', sub:'Firewall, TPM, Hypervisor' },
+  { num:'14', title:'Switching & Routing', sub:'Hub, Switch, Router, ARP' },
+  { num:'15', title:'VLANs', sub:'IEEE 802.1Q, Trunk, Access-Port' },
+  { num:'16', title:'Subnetting', sub:'CIDR, VLSM, Übungsaufgaben' },
+  { num:'17', title:'Dateisysteme', sub:'NTFS, ext4, FAT32, exFAT' },
+  { num:'18', title:'WLAN', sub:'802.11, Wi-Fi Standards, WPA3' },
+  { num:'19', title:'Normen & Organisationen', sub:'IEEE, ISO, RFC, IANA, DENIC' },
+];
+
+/* ── FLASHCARDS ── */
+const FLASHCARDS = [
+  // Grundlagen
+  { cat:'Grundlagen', q:'Was ist ein Bit?', a:'Die <strong>kleinste Informationseinheit</strong> – kann zwei Zustände annehmen: 0 oder 1 (aus/an).' },
+  { cat:'Grundlagen', q:'Wie viele Zustände kann 1 Byte darstellen?', a:'1 Byte = 8 Bit → <strong>2⁸ = 256</strong> verschiedene Zustände (0–255).' },
+  { cat:'Grundlagen', q:'Was bedeutet die Abkürzung MB/s vs. Mbit/s?', a:'<strong>MB/s</strong> = Megabyte pro Sekunde (B = Byte, groß).<br><strong>Mbit/s</strong> = Megabit pro Sekunde (b = bit, klein).<br>1 MB/s = 8 Mbit/s.' },
+  { cat:'Grundlagen', q:'Was ist der Unterschied zwischen Kibibyte (KiB) und Kilobyte (KB)?', a:'<strong>KiB</strong> = 2¹⁰ = 1.024 Byte (Binär-Präfix, IEC).<br><strong>KB</strong> = 10³ = 1.000 Byte (SI-Präfix, dezimal).<br>Erkennzeichen für Binär-Präfix: das „<strong>i</strong>" im Kürzel.' },
+  { cat:'Grundlagen', q:'Was beschreibt Hertz (Hz)?', a:'<strong>Frequenz</strong> – die Anzahl sich wiederholender Vorgänge pro Sekunde. 60 Hz = 60 Wiederholungen/Sekunde.' },
+  { cat:'Grundlagen', q:'Nenne alle SI-Präfixe von Kilo bis Peta mit Potenz.', a:'<strong>Kilo</strong> k = 10³<br><strong>Mega</strong> M = 10⁶<br><strong>Giga</strong> G = 10⁹<br><strong>Tera</strong> T = 10¹²<br><strong>Peta</strong> P = 10¹⁵' },
+
+  // EVA / Hardware
+  { cat:'Hardware', q:'Was ist das EVA-Prinzip?', a:'<strong>E</strong>ingabe – <strong>V</strong>erarbeitung – <strong>A</strong>usgabe.<br>Englisch: IPO = Input – Process – Output.<br>Beispiel: Tastatur → CPU → Monitor.' },
+  { cat:'Hardware', q:'Was ist ein Transistor?', a:'Ein elektronisches <strong>Halbleiter-Bauelement</strong>, das als <strong>Ein-/Ausschalter</strong> funktioniert. Moderne CPUs enthalten Milliarden von Transistoren.' },
+  { cat:'Hardware', q:'Was ist ein Wafer?', a:'~1 mm dicke <strong>Siliziumscheiben</strong>, die als Substrat für integrierte Schaltkreise (ICs/Chips) dienen. Werden im <strong>Lithografie-Verfahren</strong> strukturiert.' },
+  { cat:'Hardware', q:'Was ist eine Diode?', a:'Elektronisches Bauelement, das Strom nur in <strong>einer Richtung</strong> (Durchlassrichtung) passieren lässt und in der anderen (Sperrrichtung) <strong>blockiert</strong>.' },
+  { cat:'Hardware', q:'Was ist der Unterschied zwischen PGA, LGA und BGA?', a:'<strong>PGA:</strong> Pins auf CPU-Unterseite (ältere AMD).<br><strong>LGA:</strong> Kontaktflächen auf Mainboard, keine Pins auf CPU (Intel, AMD AM5).<br><strong>BGA:</strong> Dauerhaft verlötet – Laptops, Smartphones.' },
+  { cat:'Hardware', q:'Was ist L1/L2/L3 Cache?', a:'Schnelle Zwischenspeicher der CPU:<br><strong>L1:</strong> 4–256 KB, schnellster, direkt neben ALU.<br><strong>L2:</strong> 64 KB–12 MB, im Kern.<br><strong>L3:</strong> bis 256 MB, geteilt zwischen allen Kernen.' },
+  { cat:'Hardware', q:'Was ist Multithreading (Hyper-Threading)?', a:'1 physischer Kern bearbeitet <strong>2 Threads quasi-gleichzeitig</strong>. Die virtuellen Kerne teilen ALU und Cache, können aber unabhängig Befehle ausführen.' },
+  { cat:'Hardware', q:'Was ist der Base Clock (BCLK)?', a:'Grundtakt der CPU, synchronisiert alle Komponenten. <strong>CPU-Takt = BCLK × Multiplikator</strong>.<br>Beispiel: 100 MHz × 46 = 4.600 MHz = 4,6 GHz.' },
+  { cat:'Hardware', q:'Was ist der Unterschied zwischen ARM- und x86-Architektur?', a:'<strong>x86:</strong> Intel/AMD, Desktop/Server, hohe Leistung, höherer Energiebedarf.<br><strong>ARM:</strong> Entwickelt von Acorn, RISC-Design, sehr energieeffizient → Smartphones, Tablets, Raspberry Pi.' },
+
+  // Massenspeicher
+  { cat:'Speicher', q:'Was ist der Unterschied zwischen flüchtigem und nichtflüchtigem Speicher?', a:'<strong>Flüchtig (volatile):</strong> Daten gehen bei Stromverlust verloren – z.B. RAM.<br><strong>Nichtflüchtig:</strong> Daten bleiben erhalten – z.B. HDD, SSD, Flash.' },
+  { cat:'Speicher', q:'Wie funktioniert eine HDD?', a:'Rotierende <strong>Platter</strong>-Scheiben aus Metall, beschichtet mit magnetischem Material. <strong>Schreib-/Leseköpfe</strong> an Aktuatorarmen lesen/schreiben durch Magnetisierung (Nord/Süd = 0/1).' },
+  { cat:'Speicher', q:'Was sind Pits und Lands auf einer CD?', a:'Die Spiralspur einer CD besteht aus <strong>Pits</strong> (Vertiefungen) und <strong>Lands</strong> (ebene Flächen). Eine Laserdiode erkennt Reflexionsunterschiede als 0 und 1.' },
+  { cat:'Speicher', q:'Was ist SATA und wieviel Bandbreite hat SATA III?', a:'<strong>Serial ATA</strong> – serielle Schnittstelle für Festplatten/SSDs, 7 Kontakte.<br>SATA I: 1,5 Gbit/s | SATA II: 3 Gbit/s | <strong>SATA III: 6 Gbit/s</strong>.' },
+  { cat:'Speicher', q:'Was ist NVMe?', a:'<strong>Non-Volatile Memory Express</strong> – standardisiertes Software-Protokoll für SSDs über die physische Schnittstelle PCIe. Kein herstellerspezifischer Treiber nötig.' },
+
+  // Schnittstellen
+  { cat:'Schnittstellen', q:'Was ist der Unterschied zwischen serieller und paralleler Schnittstelle?', a:'<strong>Parallel:</strong> mehrere Bits <em>gleichzeitig</em> auf mehreren Leitungen (z.B. PATA).<br><strong>Seriell:</strong> Bits <em>nacheinander</em> auf einer Leitung (z.B. USB, SATA).' },
+  { cat:'Schnittstellen', q:'Wie schnell ist USB 3.1 und welchen Stecker verwendet es?', a:'USB 3.1 (Gen 2×1) = <strong>10 Gbit/s</strong>. Ab USB 3.1 wird standardmäßig der <strong>USB-C-Stecker</strong> verwendet.' },
+  { cat:'Schnittstellen', q:'Was bedeutet 8b10b-Kodierung bei USB 3.0?', a:'Um <strong>8 Bit</strong> Nutzdaten (Payload) zu übertragen, werden <strong>10 Bit</strong> gesendet – 2 Bit Overhead für Synchronisation und Fehlererkennung.' },
+  { cat:'Schnittstellen', q:'Was ist PCIe und was sind Lanes?', a:'<strong>PCI Express</strong> – serieller Erweiterungsbus (seit 2003). <strong>Lanes (x1–x16)</strong> sind parallele serielle Verbindungen. Mehr Lanes = mehr Bandbreite.' },
+  { cat:'Schnittstellen', q:'Was ist der M.2-Steckplatz?', a:'Kompakter Steckplatz, der <strong>3 Protokolle</strong> über einen Anschluss unterstützt: PCIe, SATA Rev.3, USB 3×2. Formfaktor z.B. <strong>2280</strong> = 22×80 mm.' },
+
+  // BIOS/UEFI
+  { cat:'BIOS/UEFI', q:'Was ist der Unterschied zwischen BIOS und UEFI?', a:'<strong>BIOS:</strong> Ältere Firmware, 16-Bit, max. 2 TB Laufwerke, nur MBR.<br><strong>UEFI:</strong> Moderner Nachfolger (seit 1998), 64-Bit, GUI, Secure Boot, GPT-Support.' },
+  { cat:'BIOS/UEFI', q:'Was ist die CMOS-Batterie und was passiert wenn sie leer ist?', a:'Kleine Batterie auf dem Mainboard, die den CMOS-Speicher mit Strom versorgt. Wenn leer → BIOS verliert alle Einstellungen → zeigt Datum <strong>01.01.1970 00:00</strong> (Unix-Timestamp 0).' },
+  { cat:'BIOS/UEFI', q:'Was ist Bootstrapping?', a:'Der Prozess, bei dem ein einfaches System ein komplexeres startet: <strong>UEFI/BIOS erkennt</strong> den Bootdatenträger und leitet den Start des Betriebssystems ein.' },
+
+  // RAM
+  { cat:'RAM', q:'Was bedeutet DDR bei DDR-SDRAM?', a:'<strong>Double Data Rate</strong> – der Speicher überträgt Daten bei steigender <em>und</em> fallender Flanke des Taktsignals, verdoppelt so effektiv die Bandbreite.' },
+  { cat:'RAM', q:'Was ist der Unterschied zwischen DIMM und SO-DIMM?', a:'<strong>DIMM</strong> (Dual Inline Memory Module) = Standardformat für Desktop-PCs, beidseitig kontaktiert.<br><strong>SO-DIMM</strong> = kleines Format für Notebooks.' },
+  { cat:'RAM', q:'Wie berechnet man die Bandbreite von DDR5-3200?', a:'Bandbreite = Effektiver Takt × 8 Byte = 3.200 × 8 = <strong>25.600 MB/s = PC5-25600</strong>.' },
+
+  // OSI
+  { cat:'Netzwerk', q:'Nenne alle 7 OSI-Schichten in der richtigen Reihenfolge (7→1).', a:'7 <strong>Anwendung</strong> (HTTP, DNS)<br>6 <strong>Darstellung</strong> (TLS, JPEG)<br>5 <strong>Sitzung</strong> (RPC)<br>4 <strong>Transport</strong> (TCP, UDP)<br>3 <strong>Vermittlung</strong> (IP, ICMP)<br>2 <strong>Sicherung</strong> (Ethernet, MAC)<br>1 <strong>Bitübertragung</strong> (Kabel, Hub)' },
+  { cat:'Netzwerk', q:'Auf welcher OSI-Schicht arbeiten Switch, Router und Hub?', a:'<strong>Hub:</strong> Schicht 1 (Bitübertragung).<br><strong>Switch:</strong> Schicht 2 (Sicherung, MAC-Adressen).<br><strong>Router:</strong> Schicht 3 (Vermittlung, IP-Adressen).' },
+  { cat:'Netzwerk', q:'Was ist eine MAC-Adresse?', a:'48-Bit-<strong>Hardwareadresse</strong> eines Netzwerkgeräts, hexadezimal dargestellt.<br>Erste 24 Bit = <strong>OUI</strong> (Hersteller), letzte 24 Bit = individuelle Gerätenummer.' },
+  { cat:'Netzwerk', q:'Was ist DHCP und wie funktioniert es?', a:'<strong>Dynamic Host Configuration Protocol</strong> – vergibt automatisch IP-Adresse, Subnetzmaske, Gateway und DNS-Server an Clients. Der DHCP-Server läuft als Hintergrunddienst.' },
+  { cat:'Netzwerk', q:'Was macht NAT?', a:'<strong>Network Address Translation</strong> – übersetzt lokale private IP-Adressen in die öffentliche IP des Anschlusses und zurück. Alle LAN-Geräte teilen <strong>eine</strong> externe IP.' },
+  { cat:'Netzwerk', q:'Was ist der Unterschied zwischen TCP und UDP?', a:'<strong>TCP:</strong> zuverlässig, verbindungsorientiert, garantiert Reihenfolge und Vollständigkeit → Web, E-Mail.<br><strong>UDP:</strong> verbindungslos, schnell, kein Bestätigungsmechanismus → Streaming, VoIP, Gaming.' },
+  { cat:'Netzwerk', q:'Was ist ARP?', a:'<strong>Address Resolution Protocol</strong> – ermittelt zu einer bekannten IP-Adresse die zugehörige MAC-Adresse über einen Broadcast-Request im lokalen Netz.' },
+  { cat:'Netzwerk', q:'Was ist CIDR und was bedeutet /24?', a:'<strong>Classless Inter-Domain Routing</strong> – flexible Präfixlängen statt fixer Netzklassen.<br><strong>/24</strong> = 24 Bit Netzanteil, 8 Bit Hostanteil → 256 Adressen, 254 nutzbar.' },
+  { cat:'Netzwerk', q:'Was ist der Unterschied zwischen Link-Local und Global-Unicast bei IPv6?', a:'<strong>Link-Local (fe80::/10):</strong> Automatisch vergeben, nur im lokalen Segment gültig (≈ APIPA bei IPv4).<br><strong>Global Unicast (2000::/3):</strong> Öffentlich routbare IPv6-Adresse.' },
+  { cat:'Netzwerk', q:'Was ist DNS?', a:'<strong>Domain Name System</strong> – übersetzt Domainnamen (z.B. google.de) in IP-Adressen. Hierarchisches, verteiltes System mit Root-Servern (13 logische Server, A–M).' },
+
+  // VLANs
+  { cat:'VLANs', q:'Was ist ein VLAN und wozu dient es?', a:'<strong>Virtual Local Area Network</strong> – logische Trennung eines physischen Netzes ohne extra Hardware. Verbessert <strong>Sicherheit</strong> (Abteilungstrennung) und <strong>Performance</strong> (kleinere Broadcast-Domänen).' },
+  { cat:'VLANs', q:'Was ist der Unterschied zwischen Access Port und Trunk Port?', a:'<strong>Access Port:</strong> verbindet Endgerät mit genau einem VLAN, Tag wird entfernt.<br><strong>Trunk Port:</strong> verbindet Switches/Router, trägt mehrere VLANs gleichzeitig, Tags bleiben erhalten (IEEE 802.1Q).' },
+  { cat:'VLANs', q:'Was ist das Native VLAN?', a:'Das VLAN, dem ungetaggte Frames auf einem Trunk-Port zugeordnet werden. Standard: VLAN 1 – sollte aus Sicherheitsgründen <strong>geändert werden</strong>.' },
+
+  // Subnetting
+  { cat:'Subnetting', q:'Wie viele nutzbare Hosts hat ein /27-Netz?', a:'Host-Bits = 32 − 27 = 5 → 2⁵ = 32 Adressen → <strong>30 nutzbare Hosts</strong> (−2 für Netzadresse und Broadcast).' },
+  { cat:'Subnetting', q:'Was ist die Subnetzmaske für /26?', a:'<strong>255.255.255.192</strong><br>Binary: 11111111.11111111.11111111.<strong>11</strong>000000<br>64 Adressen je Subnetz, 62 nutzbar.' },
+  { cat:'Subnetting', q:'Was ist VLSM?', a:'<strong>Variable Length Subnet Masking</strong> – Subnetze werden nach tatsächlichem Bedarf unterschiedlich groß dimensioniert. Effizienter Adressraumeinsatz ohne Verschwendung.' },
+  { cat:'Subnetting', q:'Welche Subnetzmaske hat /30 und wie viele Hosts sind nutzbar?', a:'Maske: <strong>255.255.255.252</strong><br>2² = 4 Adressen → <strong>2 nutzbare Hosts</strong>.<br>Typisch für Point-to-Point-Verbindungen zwischen Routern.' },
+
+  // Dateisysteme
+  { cat:'Dateisysteme', q:'Was sind die wichtigsten NTFS-Features?', a:'<strong>Journaling</strong> (Wiederherstellung nach Absturz), <strong>ACL</strong> (Zugriffsrechte), <strong>EFS</strong> (Verschlüsselung), <strong>MFT</strong> (zentrale Dateidatenbank), <strong>ADS</strong> (Alternate Data Streams).' },
+  { cat:'Dateisysteme', q:'Was ist der größte Nachteil von FAT32?', a:'Maximale <strong>Dateigröße von 4 GB</strong> – für große Dateien (z.B. ISO-Images, Videos) ungeeignet. Außerdem kein Journaling und keine Zugriffsrechte.' },
+  { cat:'Dateisysteme', q:'Was ist der Unterschied zwischen MBR und GPT?', a:'<strong>MBR:</strong> max. 2 TB, max. 4 primäre Partitionen, für BIOS.<br><strong>GPT:</strong> bis 9,4 ZB, bis 128 Partitionen, für UEFI – heute Standard.' },
+  { cat:'Dateisysteme', q:'Was ist Journaling in einem Dateisystem?', a:'Schreiboperationen werden vor Ausführung in ein <strong>Journal (Transaktionsprotokoll)</strong> eingetragen. Bei Absturz kann der letzte konsistente Zustand <strong>wiederhergestellt</strong> werden.' },
+
+  // WLAN
+  { cat:'WLAN', q:'Was ist der Unterschied zwischen Wi-Fi 5 (802.11ac) und Wi-Fi 6 (802.11ax)?', a:'<strong>Wi-Fi 5</strong> (802.11ac): nur 5 GHz, bis 6,9 Gbit/s, MU-MIMO.<br><strong>Wi-Fi 6</strong> (802.11ax): 2,4+5+6 GHz, bis 9,6 Gbit/s, OFDMA, effizienter bei vielen Clients.' },
+  { cat:'WLAN', q:'Warum sollte WEP nicht mehr verwendet werden?', a:'WEP verwendet <strong>RC4-Verschlüsselung</strong> mit kurzen Schlüsseln (40/104 Bit) und hat fundamentale Designfehler. Es kann in <strong>Minuten geknackt</strong> werden.' },
+  { cat:'WLAN', q:'Was ist der Vorteil des 5-GHz-Bandes gegenüber 2,4 GHz?', a:'<strong>5 GHz:</strong> bis zu 23 nicht überlappende Kanäle, weniger Interferenz, höhere Geschwindigkeit.<br><strong>Nachteil:</strong> kürzere Reichweite, schlechtere Wanddurchdringung.' },
+  { cat:'WLAN', q:'Was sind die drei überlappungsfreien Kanäle im 2,4-GHz-Band?', a:'<strong>Kanal 1, Kanal 6 und Kanal 11</strong>. Alle anderen Kanäle überlappen mit mindestens einem dieser drei.' },
+  { cat:'WLAN', q:'Was ist MIMO?', a:'<strong>Multiple Input Multiple Output</strong> – mehrere Antennen senden und empfangen gleichzeitig. Erhöht Durchsatz und Verbindungsstabilität. Weiterentwicklung: MU-MIMO (mehrere Clients gleichzeitig).' },
+
+  // Sicherheit
+  { cat:'Sicherheit', q:'Was ist eine Firewall?', a:'Ein <strong>Regelwerk</strong>, das bestimmt welche Netzwerkpakete ein System betreten oder verlassen dürfen. Schutzt vor unautorisierten Zugriffen von außen und im Netz.' },
+  { cat:'Sicherheit', q:'Was ist TPM und wozu dient es?', a:'<strong>Trusted Platform Module</strong> – Sicherheitschip auf dem Mainboard. Erzeugt und verwaltet kryptografische Schlüssel, ermöglicht BitLocker. <strong>TPM 2.0 ist Pflicht für Windows 11</strong>.' },
+  { cat:'Sicherheit', q:'Was ist der Unterschied zwischen Typ-I und Typ-II-Hypervisor?', a:'<strong>Typ I (Bare-Metal):</strong> direkt auf Hardware, kein Host-OS nötig (z.B. ProxMox, Hyper-V). Bessere Performance.<br><strong>Typ II (Hosted):</strong> läuft auf bestehendem OS (z.B. VirtualBox).' },
+];
+
+/* ── QUIZ QUESTIONS ── */
+const QUESTIONS = [
+  // Multiple Choice – Grundlagen
+  { type:'mc', topic:'Grundlagen', diff:1, q:'Wie viele Bit hat ein Byte?', opts:['4','6','8','16'], correct:2, exp:'1 Byte = <strong>8 Bit</strong>. Damit lassen sich 2⁸ = 256 verschiedene Werte (0–255) darstellen.' },
+  { type:'mc', topic:'Grundlagen', diff:1, q:'Welches Präfix steht für 10⁹ (eine Milliarde)?', opts:['Mega','Giga','Tera','Peta'], correct:1, exp:'<strong>Giga (G)</strong> = 10⁹. Mega = 10⁶, Tera = 10¹², Peta = 10¹⁵.' },
+  { type:'mc', topic:'Grundlagen', diff:2, q:'Was ist der korrekte Wert für 1 GiB (Gibibyte)?', opts:['1.000.000.000 Byte','1.024.000.000 Byte','1.073.741.824 Byte','1.000.000.024 Byte'], correct:2, exp:'1 GiB = 2³⁰ = <strong>1.073.741.824 Byte</strong>. Das „i" im Präfix signalisiert den Binär-Standard (IEC).' },
+  { type:'tf', topic:'Grundlagen', diff:1, q:'Ein Bit kann mehr als 2 Zustände darstellen.', correct:false, exp:'Falsch. Ein Bit kann genau <strong>2 Zustände</strong> darstellen: 0 und 1 (aus/an).' },
+  { type:'tf', topic:'Grundlagen', diff:2, q:'1 MB/s entspricht 8 Mbit/s.', correct:true, exp:'Richtig. 1 Byte = 8 Bit → 1 MB/s = 1 × 8 Mbit/s = <strong>8 Mbit/s</strong>.' },
+  { type:'fill', topic:'Grundlagen', diff:1, q:'Das EVA-Prinzip steht für Eingabe – ___ – Ausgabe.', answer:'Verarbeitung', exp:'<strong>E</strong>ingabe – <strong>V</strong>erarbeitung – <strong>A</strong>usgabe (englisch: Input – Process – Output).' },
+  { type:'fill', topic:'Grundlagen', diff:2, q:'Binär-Präfixe erkennst du am Buchstaben ___ im Kürzel (z.B. KiB, MiB).', answer:'i', exp:'Das <strong>„i"</strong> steht für den IEC-Standard (Binär-Präfix). Kibibyte (KiB) = 2¹⁰ = 1.024 Byte.' },
+
+  // Multiple Choice – Hardware
+  { type:'mc', topic:'Grundlagen', diff:2, q:'Welcher Intel-Prozessor begründete die x86-Architektur?', opts:['Intel 4004','Intel 8080','Intel 8086','Intel 80286'], correct:2, exp:'Der <strong>Intel 8086</strong> (1978) ist der Ursprung der x86-Architektur. Der 4004 (1971) war der erste Mikroprozessor, der 8080 (1974) der erste vollwertige 8-Bit-CPU.' },
+  { type:'mc', topic:'Grundlagen', diff:2, q:'Was beschreibt der Base Clock (BCLK)?', opts:['Die Spannung der CPU','Der Grundtakt zur Synchronisation aller Komponenten','Die Anzahl der Transistoren','Die Cache-Größe'], correct:1, exp:'<strong>BCLK</strong> ist der Grundtakt des Systems. CPU-Takt = BCLK × Multiplikator.' },
+  { type:'mc', topic:'Grundlagen', diff:1, q:'Welcher Sockeltyp wird bei Laptops und Smartphones dauerhaft verlötet?', opts:['PGA','LGA','BGA','ZIF'], correct:2, exp:'<strong>BGA (Ball Grid Array)</strong> wird dauerhaft verlötet, kein Austausch möglich. Typisch für Laptops, Smartphones, Raspberry Pi.' },
+  { type:'tf', topic:'Grundlagen', diff:2, q:'Multithreading bedeutet, dass ein Kern zwei voneinander unabhängige Prozesse quasi-gleichzeitig bearbeiten kann.', correct:true, exp:'Richtig. Hyper-Threading / Multithreading erlaubt einem physischen Kern, <strong>2 Threads</strong> quasi-parallel zu bearbeiten, indem Wartezeiten genutzt werden.' },
+  { type:'mc', topic:'Grundlagen', diff:2, q:'Welcher Cache-Level ist der schnellste?', opts:['L4','L3','L2','L1'], correct:3, exp:'<strong>L1-Cache</strong> ist der schnellste und kleinste Cache (4–256 KB), direkt neben der ALU, läuft mit Prozessortakt.' },
+  { type:'fill', topic:'Grundlagen', diff:1, q:'BIOS steht für Basic Input/Output ___.', answer:'System', exp:'BIOS = <strong>Basic Input/Output System</strong> – Firmware des Mainboards, initialisiert Hardware beim Start.' },
+  { type:'tf', topic:'Grundlagen', diff:2, q:'UEFI und BIOS sind technisch identisch – UEFI ist lediglich eine neuere Version des BIOS.', correct:false, exp:'Falsch. UEFI ist ein <strong>eigenständiger Standard</strong>, der das BIOS ersetzt. Unterschiede: UEFI unterstützt GPT, Secure Boot, grafische GUI, 64-Bit-Modus.' },
+
+  // Schnittstellen
+  { type:'mc', topic:'Schnittstellen', diff:1, q:'Wie schnell ist USB 3.2 (Gen 2×2)?', opts:['5 Gbit/s','10 Gbit/s','20 Gbit/s','40 Gbit/s'], correct:2, exp:'USB 3.2 Gen 2×2 = <strong>20 Gbit/s</strong>. Die Bezeichnung 2×2 steht für 2 Lanes mit je 10 Gbit/s.' },
+  { type:'mc', topic:'Schnittstellen', diff:2, q:'Welches Kodierungsverfahren nutzt PCIe 3.0–5.0?', opts:['8b/10b','128b/130b','242B/256B','64b/66b'], correct:1, exp:'PCIe 3.0–5.0 nutzt <strong>128b/130b</strong>-Kodierung. PCIe 1/2: 8b/10b. PCIe 6+: 242B/256B.' },
+  { type:'mc', topic:'Schnittstellen', diff:1, q:'Was ist SATA III und wie schnell ist es?', opts:['Parallel ATA, 133 MB/s','Serial ATA Revision 3, 6 Gbit/s','Serial ATA Revision 2, 3 Gbit/s','NVMe über PCIe, 32 Gbit/s'], correct:1, exp:'<strong>SATA III</strong> (Revision 3) = 6 Gbit/s. Es ist die aktuelle serielle ATA-Spezifikation mit 7-poligem Anschluss.' },
+  { type:'tf', topic:'Schnittstellen', diff:1, q:'Der M.2-Steckplatz unterstützt nur das NVMe-Protokoll.', correct:false, exp:'Falsch. M.2 unterstützt <strong>drei Protokolle</strong>: PCIe (für NVMe), SATA Rev.3 und USB 3×2 – über einen einzigen physischen Anschluss.' },
+  { type:'fill', topic:'Schnittstellen', diff:1, q:'USB steht für Universal ___ Bus.', answer:'Serial', exp:'USB = <strong>Universal Serial Bus</strong> – serielle Datenübertragung zwischen Computer und Peripheriegeräten.' },
+  { type:'fill', topic:'Schnittstellen', diff:2, q:'Der M.2-Formfaktor 2280 bedeutet: ___ mm Breite und 80 mm Länge.', answer:'22', exp:'<strong>2280</strong> = 22 mm Breite × 80 mm Länge. Andere Längen: 2242, 2260, 2242 etc.' },
+
+  // Netzwerk
+  { type:'mc', topic:'Netzwerk', diff:1, q:'Wie viele Bit hat eine MAC-Adresse?', opts:['32 Bit','48 Bit','64 Bit','128 Bit'], correct:1, exp:'Eine MAC-Adresse ist <strong>48 Bit</strong> lang (6 Byte, hexadezimal dargestellt). Erste 24 Bit = OUI (Hersteller), letzte 24 Bit = individuell.' },
+  { type:'mc', topic:'Netzwerk', diff:2, q:'Welche IPv4-Adresse ist die Netzwerkadresse von 192.168.5.0/24?', opts:['192.168.5.1','192.168.5.0','192.168.5.255','192.168.0.0'], correct:1, exp:'Die <strong>Netzwerkadresse</strong> ist immer die erste Adresse im Subnetz: <strong>192.168.5.0</strong>. Die letzte (192.168.5.255) ist der Broadcast.' },
+  { type:'mc', topic:'Netzwerk', diff:1, q:'Was macht ein DNS-Server?', opts:['Vergibt IP-Adressen automatisch','Übersetzt Domainnamen in IP-Adressen','Filtert Netzwerkpakete','Verbindet zwei verschiedene Netzwerke'], correct:1, exp:'<strong>DNS</strong> (Domain Name System) übersetzt Domainnamen wie google.de in IP-Adressen. DHCP vergibt IPs, Firewall filtert, Router verbindet Netze.' },
+  { type:'tf', topic:'Netzwerk', diff:2, q:'NAT ermöglicht es mehreren Geräten in einem LAN, eine gemeinsame externe IP-Adresse zu nutzen.', correct:true, exp:'Richtig. <strong>NAT</strong> (Network Address Translation) übersetzt lokale IPs in die öffentliche IP des Routers. Alle LAN-Geräte teilen eine externe IP.' },
+  { type:'mc', topic:'Netzwerk', diff:1, q:'Auf welcher OSI-Schicht arbeitet ein Switch?', opts:['Schicht 1','Schicht 2','Schicht 3','Schicht 4'], correct:1, exp:'Ein Switch arbeitet auf <strong>Schicht 2</strong> (Sicherungsschicht) und leitet Frames anhand der MAC-Adresstabelle (CAM-Table) gezielt weiter.' },
+  { type:'mc', topic:'Netzwerk', diff:2, q:'Was ist der Zweck des ARP-Protokolls?', opts:['IP-Adressen vergeben','MAC-Adresse zu einer IP-Adresse ermitteln','Domainauflösung','NAT-Übersetzung'], correct:1, exp:'<strong>ARP</strong> (Address Resolution Protocol) ermittelt per Broadcast-Request die MAC-Adresse zu einer bekannten IP-Adresse im lokalen Netz.' },
+  { type:'fill', topic:'Netzwerk', diff:1, q:'Das Protokoll, das IP-Adressen automatisch vergibt, heißt ___.', answer:'DHCP', exp:'<strong>DHCP</strong> (Dynamic Host Configuration Protocol) vergibt automatisch IP-Adresse, Subnetzmaske, Gateway und DNS.' },
+  { type:'tf', topic:'Netzwerk', diff:1, q:'TCP ist ein verbindungsloses Protokoll ohne Bestätigungsmechanismus.', correct:false, exp:'Falsch. Das ist <strong>UDP</strong>. TCP ist verbindungsorientiert und garantiert Vollständigkeit und Reihenfolge der Pakete.' },
+  { type:'mc', topic:'Netzwerk', diff:2, q:'Wie viele Bit hat eine IPv6-Adresse?', opts:['32 Bit','64 Bit','96 Bit','128 Bit'], correct:3, exp:'IPv6-Adressen sind <strong>128 Bit</strong> lang (8 Blöcke à 16 Bit). Das ergibt 2¹²⁸ ≈ 340 Sextillionen mögliche Adressen.' },
+  { type:'mc', topic:'Netzwerk', diff:2, q:'Welcher IPv6-Präfix kennzeichnet Link-Local-Adressen?', opts:['fc00::/7','2000::/3','fe80::/10','fd00::/8'], correct:2, exp:'<strong>fe80::/10</strong> ist der Präfix für Link-Local-Unicast-Adressen. Diese sind nur im lokalen Netzsegment gültig, vergleichbar mit APIPA (169.254.x.x) bei IPv4.' },
+
+  // Subnetting
+  { type:'subnet', topic:'Subnetting', diff:2, q:'Gegeben: 10.10.5.0/28<br>Wie viele nutzbare Hosts gibt es?', answer:'14', exp:'/28 → Host-Bits = 4 → 2⁴ = 16 Adressen → <strong>14 nutzbare Hosts</strong> (−2 für Netzadresse und Broadcast).' },
+  { type:'subnet', topic:'Subnetting', diff:2, q:'Gegeben: 172.16.0.0/25<br>Welches ist die Broadcast-Adresse?', answer:'172.16.0.127', exp:'/25 → 128 Adressen → Subnetze bei .0 und .128<br>Netz: 172.16.0.0 → Broadcast: <strong>172.16.0.127</strong>.' },
+  { type:'subnet', topic:'Subnetting', diff:3, q:'Du brauchst mind. 50 Hosts in einem Subnetz. Welcher CIDR-Präfix ist der kleinstmögliche?', answer:'/26', exp:'/26 → 2⁶−2 = <strong>62 Hosts</strong>. /27 ergibt nur 30 Hosts, das reicht nicht. Also ist <strong>/26</strong> der kleinste passende Präfix.' },
+  { type:'subnet', topic:'Subnetting', diff:2, q:'Wie lautet die Subnetzmaske für /27?', answer:'255.255.255.224', exp:'/27 → 5 Host-Bits → letztes Oktett binär: 11100000 = 224 → <strong>255.255.255.224</strong>.' },
+  { type:'subnet', topic:'Subnetting', diff:3, q:'192.168.1.200/26 – In welchem Subnetz liegt diese Adresse?', answer:'192.168.1.192', exp:'/26 → 64 Adressen. Subnetze: .0, .64, .128, <strong>.192</strong>. 200 liegt im Bereich .192–.255 → Netz: <strong>192.168.1.192</strong>.' },
+  { type:'mc', topic:'Subnetting', diff:2, q:'Ein /29-Netz enthält wie viele nutzbare Hosts?', opts:['4','6','8','14'], correct:1, exp:'/29 → Host-Bits = 3 → 2³ = 8 Adressen → <strong>6 nutzbare Hosts</strong> (8 − 2 für Netz + Broadcast).' },
+  { type:'mc', topic:'Subnetting', diff:3, q:'Du teilst 10.0.0.0/24 in 8 gleich große Subnetze. Welchen Präfix nutzt du?', opts:['/25','/26','/27','/28'], correct:2, exp:'8 Subnetze = 2³ → 3 zusätzliche Bits → /24 + 3 = <strong>/27</strong>. Jedes Subnetz hat 30 nutzbare Hosts.' },
+
+  // VLANs
+  { type:'mc', topic:'Netzwerk', diff:2, q:'Was ist IEEE 802.1Q?', opts:['WLAN-Standard','VLAN-Tagging-Standard','Spanning-Tree-Protokoll','Link-Aggregation-Standard'], correct:1, exp:'<strong>IEEE 802.1Q</strong> ist der Standard für VLAN-Tagging in Ethernet-Frames. Der 4-Byte-Tag enthält die VLAN-ID (1–4094).' },
+  { type:'tf', topic:'Netzwerk', diff:2, q:'Geräte in verschiedenen VLANs können ohne Router direkt miteinander kommunizieren.', correct:false, exp:'Falsch. VLANs trennen Broadcast-Domänen. Für die Kommunikation zwischen VLANs wird ein <strong>Router oder Layer-3-Switch</strong> (Inter-VLAN-Routing) benötigt.' },
+  { type:'fill', topic:'Netzwerk', diff:2, q:'Ein Port, der nur einem einzigen VLAN zugeordnet ist, nennt man ___ Port.', answer:'Access', exp:'Ein <strong>Access Port</strong> verbindet ein Endgerät mit genau einem VLAN. Der Switch entfernt den VLAN-Tag in Richtung Endgerät.' },
+
+  // Dateisysteme
+  { type:'mc', topic:'Dateisysteme', diff:1, q:'Welches Dateisystem hat eine maximale Dateigröße von 4 GB?', opts:['NTFS','exFAT','FAT32','ext4'], correct:2, exp:'<strong>FAT32</strong> hat eine harte Dateigrößenbeschränkung von <strong>4 GB</strong>. Das ist der Hauptgrund, warum es für große Dateien (z.B. ISO-Images) ungeeignet ist.' },
+  { type:'tf', topic:'Dateisysteme', diff:1, q:'NTFS unterstützt Zugriffsrechte (ACLs) auf Dateiebene.', correct:true, exp:'Richtig. <strong>NTFS</strong> unterstützt Access Control Lists (ACLs) mit feingranularen Rechten pro Benutzer und Gruppe (Lesen, Schreiben, Ausführen, Vollzugriff).' },
+  { type:'mc', topic:'Dateisysteme', diff:2, q:'Was bedeutet Journaling in einem Dateisystem?', opts:['Komprimierung von Dateien','Protokollierung von Schreiboperationen zur Fehlerkorrektur','Verschlüsselung der Daten','Automatische Defragmentierung'], correct:1, exp:'<strong>Journaling</strong> protokolliert Schreibvorgänge vor Ausführung. Bei einem Systemabsturz kann der letzte konsistente Zustand wiederhergestellt werden.' },
+  { type:'fill', topic:'Dateisysteme', diff:2, q:'Die zentrale Dateidatenbank in NTFS heißt ___ (Abkürzung).', answer:'MFT', exp:'Die <strong>MFT (Master File Table)</strong> ist die zentrale Datenbank in NTFS, die alle Dateien und ihre Metadaten verwaltet.' },
+  { type:'mc', topic:'Dateisysteme', diff:2, q:'Welcher Partitionsstandard unterstützt Laufwerke größer als 2 TB und bis zu 128 Partitionen?', opts:['MBR','FAT32','GPT','NTFS'], correct:2, exp:'<strong>GPT (GUID Partition Table)</strong> unterstützt Laufwerke bis 9,4 ZB und bis zu 128 Partitionen. MBR ist auf 2 TB und 4 primäre Partitionen begrenzt.' },
+
+  // WLAN
+  { type:'mc', topic:'WLAN', diff:1, q:'Welcher WLAN-Standard wird auch „Wi-Fi 6" genannt?', opts:['802.11ac','802.11ax','802.11n','802.11be'], correct:1, exp:'<strong>802.11ax</strong> ist Wi-Fi 6 (und Wi-Fi 6E mit 6-GHz-Unterstützung). Wi-Fi 5 = 802.11ac, Wi-Fi 4 = 802.11n, Wi-Fi 7 = 802.11be.' },
+  { type:'mc', topic:'WLAN', diff:2, q:'Welches WLAN-Sicherheitsprotokoll gilt als sicher und wird empfohlen?', opts:['WEP','WPA','WPA2 (ohne starkes Passwort)','WPA3'], correct:3, exp:'<strong>WPA3</strong> ist das aktuell sicherste Protokoll. Es schützt auch vor Wörterbuchangriffen (SAE – Simultaneous Authentication of Equals) und verwendet AES-GCMP.' },
+  { type:'tf', topic:'WLAN', diff:1, q:'Im 2,4-GHz-Band gibt es 13 Kanäle, davon sind nur 3 überlappungsfrei.', correct:true, exp:'Richtig. Im 2,4-GHz-Band (DE) sind nur <strong>Kanal 1, 6 und 11</strong> überlappungsfrei. Alle anderen Kanäle überlappen mit mindestens einem dieser drei.' },
+  { type:'fill', topic:'WLAN', diff:1, q:'SSID steht für Service Set ___.', answer:'Identifier', exp:'<strong>SSID = Service Set Identifier</strong> – der sichtbare Name eines WLAN-Netzwerks.' },
+  { type:'mc', topic:'WLAN', diff:2, q:'Was ist MIMO?', opts:['Ein Sicherheitsprotokoll','Eine Frequenztechnik','Mehrere Antennen für simultane Übertragung','Ein Routingprotokoll'], correct:2, exp:'<strong>MIMO (Multiple Input Multiple Output)</strong> nutzt mehrere Antennen zum gleichzeitigen Senden und Empfangen, was Durchsatz und Stabilität erhöht.' },
+
+  // Sicherheit
+  { type:'mc', topic:'Sicherheit', diff:1, q:'Für welches Windows-Feature wird TPM 2.0 zwingend benötigt?', opts:['Windows Update','BitLocker und Windows 11','Windows Defender','Hyper-V'], correct:1, exp:'<strong>TPM 2.0</strong> ist Voraussetzung für <strong>Windows 11</strong> und ermöglicht u.a. die <strong>BitLocker</strong>-Festplattenverschlüsselung.' },
+  { type:'mc', topic:'Sicherheit', diff:2, q:'Was ist ein Typ-I-Hypervisor?', opts:['Ein Hypervisor der auf einem Host-OS läuft','Ein Hypervisor direkt auf der Hardware (Bare-Metal)','Ein Cloud-Dienst','Eine Art Firewall'], correct:1, exp:'<strong>Typ-I (Bare-Metal)</strong>-Hypervisor läuft direkt auf der Hardware ohne Host-OS (z.B. ProxMox, Hyper-V, VMware ESXi). Bessere Performance als Typ II.' },
+  { type:'tf', topic:'Sicherheit', diff:1, q:'Eine Firewall schützt nur vor Angriffen aus dem Internet, nicht aus dem lokalen Netz.', correct:false, exp:'Falsch. Eine Firewall am <strong>Endgerät</strong> schützt auch vor Geräten im gleichen lokalen Netzwerk. Erst am Router/Gateway wird nur das Internet gefiltert.' },
+];
+
+/* ── LERNPFAD ── */
+const PATH_STEPS = [
+  { label:'Einstieg', title:'Datendarstellung & Grundbegriffe', desc:'Bit, Byte, Präfixe, Hertz – die fundamentalen Konzepte, ohne die nichts verständlich ist.', tags:['Kap. 1','Kap. 2'], ch:'01' },
+  { label:'Hardware-Basis', title:'EVA-Prinzip & Halbleiter', desc:'Wie ein Computer grundsätzlich funktioniert – Eingabe, Verarbeitung, Ausgabe und die physikalischen Grundlagen.', tags:['Kap. 3','Kap. 4'], ch:'03' },
+  { label:'Prozessor', title:'CPU im Detail', desc:'ALU, Cache-Hierarchie, Sockeltypen, Takt, Kerne und Architekturen (x86, ARM).', tags:['Kap. 4'], ch:'04' },
+  { label:'Speicher', title:'RAM & Massenspeicher', desc:'DDR-SDRAM, DIMM, Festplatten, optische Medien und Dateisysteme.', tags:['Kap. 5','Kap. 8','Kap. 17'], ch:'05' },
+  { label:'Schnittstellen', title:'Busse & Anschlüsse', desc:'USB, SATA, PCIe, M.2, NVMe – wie Komponenten miteinander verbunden werden.', tags:['Kap. 6','Kap. 7'], ch:'06' },
+  { label:'Netzwerk I', title:'OSI-Modell & Grundlagen', desc:'Das 7-Schichten-Modell als Fundament für alles Weitere. NIC, Ethernet, MAC.', tags:['Kap. 10','Kap. 11'], ch:'10' },
+  { label:'Netzwerk II', title:'IPv4, Subnetting & DHCP', desc:'IP-Adressen verstehen, Subnetze berechnen und DHCP/DNS/NAT einordnen.', tags:['Kap. 11','Kap. 16'], ch:'11' },
+  { label:'Netzwerk III', title:'Switching & Routing', desc:'Hub vs. Switch vs. Router, ARP, Routing-Tabellen und Longest-Prefix-Match.', tags:['Kap. 14'], ch:'14' },
+  { label:'Netzwerk IV', title:'VLANs & fortgeschrittene Segmentierung', desc:'IEEE 802.1Q, Trunk-Ports, Access-Ports und typische Enterprise-VLAN-Designs.', tags:['Kap. 15'], ch:'15' },
+  { label:'Konnektivität', title:'Protokolle, DSL & Glasfaser', desc:'TCP/UDP, HTTP/S, DSL-Varianten, DOCSIS und Glasfaser-Ausbauvarianten.', tags:['Kap. 12'], ch:'12' },
+  { label:'Funk', title:'WLAN & Standards', desc:'IEEE 802.11-Standards, Frequenzbänder, Kanalplanung und WLAN-Sicherheit.', tags:['Kap. 18'], ch:'18' },
+  { label:'Sicherheit', title:'Firewall, TPM & Virtualisierung', desc:'Sicherheitskonzepte, Hypervisor Typ I & II, ISO-Dateien und BitLocker.', tags:['Kap. 13'], ch:'13' },
+  { label:'Abschluss', title:'Normen, Standards & Organisationen', desc:'IEEE, ISO, RFC, IANA, DENIC – wer macht welche Regeln?', tags:['Kap. 19'], ch:'19' },
+];
+
+/* ── GLOSSAR ── */
+const GLOSSARY = [
+  { term:'ALU', def:'Arithmetic Logical Unit – Rechenwerk der CPU, führt Rechen- und Logikoperationen durch.', tag:'Hardware' },
+  { term:'ARP', def:'Address Resolution Protocol – ermittelt per Broadcast die MAC-Adresse zu einer IP-Adresse.', tag:'Netzwerk' },
+  { term:'BCLK', def:'Base Clock – Grundtakt des Systems. CPU-Takt = BCLK × Multiplikator.', tag:'Hardware' },
+  { term:'BGA', def:'Ball Grid Array – dauerhaft verlöteter Chip ohne austauschbare Pins. Typisch für Laptops/Smartphones.', tag:'Hardware' },
+  { term:'BIOS', def:'Basic Input/Output System – Firmware des Mainboards, initialisiert Hardware und startet das OS.', tag:'Hardware' },
+  { term:'CIDR', def:'Classless Inter-Domain Routing – flexible Präfixlängen (/24, /26) statt fixer Netzklassen.', tag:'Netzwerk' },
+  { term:'CMOS', def:'Schreib-/Lesespeicher auf dem Mainboard, speichert BIOS-Einstellungen. Wird von CMOS-Batterie gespeist.', tag:'Hardware' },
+  { term:'DDR', def:'Double Data Rate – RAM überträgt Daten bei steigender und fallender Takflanke.', tag:'Hardware' },
+  { term:'DHCP', def:'Dynamic Host Configuration Protocol – vergibt automatisch IP, Maske, Gateway und DNS.', tag:'Netzwerk' },
+  { term:'DIMM', def:'Dual Inline Memory Module – beidseitig kontaktiertes RAM-Modul für Desktop-PCs.', tag:'Hardware' },
+  { term:'DNS', def:'Domain Name System – übersetzt Domainnamen (google.de) in IP-Adressen.', tag:'Netzwerk' },
+  { term:'EFI/UEFI', def:'Unified Extensible Firmware Interface – moderner BIOS-Nachfolger mit GUI, GPT-Support, Secure Boot.', tag:'Hardware' },
+  { term:'EFS', def:'Encrypting File System – integrierte Dateiverschlüsselung in NTFS.', tag:'Dateisystem' },
+  { term:'Ethernet', def:'Kabelgebundener Netzwerkstandard (IEEE 802.3). Nutzt RJ-45-Stecker mit 8 Kontakten.', tag:'Netzwerk' },
+  { term:'FAT32', def:'File Allocation Table 32 – älteres Dateisystem, max. 4 GB Dateigröße, hohe Kompatibilität.', tag:'Dateisystem' },
+  { term:'exFAT', def:'Extended FAT – FAT32-Nachfolger für Wechseldatenträger, keine 4-GB-Begrenzung.', tag:'Dateisystem' },
+  { term:'Gateway', def:'Übergang zwischen lokalem Netz (LAN) und externem Netz (WAN/Internet).', tag:'Netzwerk' },
+  { term:'GPT', def:'GUID Partition Table – moderner Partitionsstandard: bis 9,4 ZB, 128 Partitionen. Benötigt UEFI.', tag:'Dateisystem' },
+  { term:'HDD', def:'Hard Disk Drive – magnetisches Festplattenlaufwerk mit rotierenden Plattern und Aktuatorarmen.', tag:'Hardware' },
+  { term:'Hypervisor', def:'Software zur Virtualisierung: Typ I (Bare-Metal, direkt auf HW) oder Typ II (auf Host-OS).', tag:'Sicherheit' },
+  { term:'ICMP', def:'Internet Control Message Protocol – Steuerungs-/Fehlernachrichten in IPv4-Netzen; Basis für ping.', tag:'Netzwerk' },
+  { term:'IEEE', def:'Institute of Electrical and Electronics Engineers – Standardisierungsorganisation für Technik/IT.', tag:'Normen' },
+  { term:'IP', def:'Internet Protocol – logische Adressierung in Netzwerken. IPv4: 32 Bit; IPv6: 128 Bit.', tag:'Netzwerk' },
+  { term:'ISP', def:'Internet Service Provider – Internetanbieter (z.B. Telekom, Vodafone).', tag:'Netzwerk' },
+  { term:'LAN', def:'Local Area Network – lokales Netzwerk an einem Standort.', tag:'Netzwerk' },
+  { term:'LGA', def:'Land Grid Array – Kontaktflächen auf dem Mainboard. Typisch für Intel (LGA 1700).', tag:'Hardware' },
+  { term:'MAC-Adresse', def:'Media Access Control – 48-Bit-Hardwareadresse. Erste 24 Bit = Hersteller (OUI), letzte 24 = individuell.', tag:'Netzwerk' },
+  { term:'MBR', def:'Master Boot Record – älterer Partitionsstandard: max. 2 TB, 4 primäre Partitionen.', tag:'Dateisystem' },
+  { term:'MFT', def:'Master File Table – zentrale Dateidatenbank in NTFS, speichert alle Dateien und Metadaten.', tag:'Dateisystem' },
+  { term:'MIMO', def:'Multiple Input Multiple Output – mehrere Antennen für gleichzeitiges Senden/Empfangen bei WLAN.', tag:'WLAN' },
+  { term:'MMU', def:'Memory Management Unit – übersetzt virtuelle Speicheradressen in physische.', tag:'Hardware' },
+  { term:'NAT', def:'Network Address Translation – übersetzt lokale IPs in öffentliche IP. Alle LAN-Geräte teilen eine externe IP.', tag:'Netzwerk' },
+  { term:'NIC', def:'Network Interface Controller – Netzwerkkarte. Heute meist auf dem Mainboard integriert.', tag:'Netzwerk' },
+  { term:'NTFS', def:'New Technology File System – Windows-Standard. Journaling, ACL, EFS, MFT.', tag:'Dateisystem' },
+  { term:'NVMe', def:'Non-Volatile Memory Express – standardisiertes Protokoll für SSDs über PCIe. Kein Herstellertreiber nötig.', tag:'Hardware' },
+  { term:'OSI-Modell', def:'7-Schichten-Referenzmodell für Netzwerkkommunikation: Bitübertragung–Sicherung–Vermittlung–Transport–Sitzung–Darstellung–Anwendung.', tag:'Netzwerk' },
+  { term:'PCIe', def:'PCI Express – serieller Erweiterungsbus seit 2003. Lanes x1–x16. Basis für NVMe, Grafikkarten etc.', tag:'Hardware' },
+  { term:'PGA', def:'Pin Grid Array – Pins auf CPU-Unterseite. Typisch für ältere AMD-CPUs.', tag:'Hardware' },
+  { term:'RFC', def:'Request for Comments – technische Internetstandards, seit 1969 veröffentlicht.', tag:'Normen' },
+  { term:'RJ-45', def:'8-poliger Netzwerkstecker (8P8C) für Ethernet-Kabel.', tag:'Netzwerk' },
+  { term:'Router', def:'Netzwerkgerät auf OSI-Schicht 3 – verbindet Netze und leitet Pakete anhand von IP-Adressen weiter.', tag:'Netzwerk' },
+  { term:'SATA', def:'Serial ATA – serielle Schnittstelle für Festplatten/SSDs. SATA III: 6 Gbit/s.', tag:'Hardware' },
+  { term:'SoC', def:'System on a Chip – ein IC mit vielen Funktionen: CPU, GPU, WLAN, RAM etc. Typisch für Smartphones.', tag:'Hardware' },
+  { term:'SO-DIMM', def:'Small Outline DIMM – kleineres RAM-Modul für Notebooks.', tag:'Hardware' },
+  { term:'SSID', def:'Service Set Identifier – der Name eines WLAN-Netzwerks.', tag:'WLAN' },
+  { term:'Subnetzmaske', def:'Teilt eine IP-Adresse in Netzanteil (Einsen) und Hostanteil (Nullen). z.B. /24 = 255.255.255.0.', tag:'Netzwerk' },
+  { term:'Switch', def:'Netzwerkgerät auf OSI-Schicht 2 – leitet Frames gezielt anhand der MAC-Adresstabelle (CAM-Table) weiter.', tag:'Netzwerk' },
+  { term:'TCP', def:'Transmission Control Protocol – zuverlässig, verbindungsorientiert. Garantiert Vollständigkeit und Reihenfolge.', tag:'Protokoll' },
+  { term:'TPM', def:'Trusted Platform Module – Sicherheitschip für kryptografische Schlüssel, BitLocker. TPM 2.0 = Pflicht für Win11.', tag:'Sicherheit' },
+  { term:'Transistor', def:'Elektronischer Halbleiter-Schalter (Ein/Aus). Milliardenfach auf modernen CPUs.', tag:'Hardware' },
+  { term:'Trunk Port', def:'VLAN-Port, der mehrere VLANs mit Tags gleichzeitig trägt. Verbindet Switches oder Switch mit Router.', tag:'VLAN' },
+  { term:'UDP', def:'User Datagram Protocol – verbindungslos, schnell, kein Bestätigungsmechanismus. Für Streaming, VoIP.', tag:'Protokoll' },
+  { term:'USB', def:'Universal Serial Bus – serielle Schnittstelle für Peripheriegeräte. USB 4: bis 40 Gbit/s.', tag:'Hardware' },
+  { term:'VLAN', def:'Virtual Local Area Network – logische Netztrennung auf Switches ohne eigene Hardware (IEEE 802.1Q).', tag:'VLAN' },
+  { term:'VLSM', def:'Variable Length Subnet Masking – unterschiedlich große Subnetze nach Bedarf, effizienter Adresseinsatz.', tag:'Netzwerk' },
+  { term:'WAN', def:'Wide Area Network – Netzwerk über größere Entfernungen, z.B. das Internet.', tag:'Netzwerk' },
+  { term:'Wafer', def:'~1 mm dicke Siliziumscheibe als Substrat für ICs. Strukturiert im Lithografie-Verfahren.', tag:'Hardware' },
+  { term:'WPA3', def:'Aktuellstes WLAN-Sicherheitsprotokoll (AES-GCMP, SAE). Schützt vor Wörterbuchangriffen.', tag:'WLAN' },
+  { term:'ext4', def:'Standard-Linux-Dateisystem. Journaling, schnell, max. 16 TB Dateigröße.', tag:'Dateisystem' },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let state = {
+  knownCards: new Set(),
+  doneChapters: new Set(),
+  doneSteps: new Set(),
+  fcIndex: 0,
+  fcFlipped: false,
+  fcFiltered: [...FLASHCARDS],
+  fcFilter: 'all',
+  quizItems: [],
+  quizAnswers: {},
+  quizChecked: {},
+  // Leitner: cardKey -> fach 1..5 (1=neu, 5=gelernt)
+  leitnerBox: {},
+  // Fehlerstapel: array of QUESTIONS indices
+  errorStack: [],
+  errorMode: false,
+};
+
+function cardKey(card) { return card.cat + '::' + card.q; }
+
+function saveState() {
+  try {
+    localStorage.setItem('itg_state', JSON.stringify({
+      knownCards: [...state.knownCards],
+      doneChapters: [...state.doneChapters],
+      doneSteps: [...state.doneSteps],
+      leitnerBox: state.leitnerBox,
+      errorStack: state.errorStack,
+    }));
+  } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('itg_state') || '{}');
+    state.knownCards = new Set(s.knownCards || []);
+    state.doneChapters = new Set(s.doneChapters || []);
+    state.doneSteps = new Set(s.doneSteps || []);
+    state.leitnerBox = s.leitnerBox || {};
+    state.errorStack = s.errorStack || [];
+    // init all cards to fach 1 if not set
+    FLASHCARDS.forEach(c => {
+      const k = cardKey(c);
+      if (!state.leitnerBox[k]) state.leitnerBox[k] = 1;
+    });
+  } catch(e) {
+    FLASHCARDS.forEach(c => { state.leitnerBox[cardKey(c)] = 1; });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event && event.target && event.target.classList.add('active');
+  if (id === 'flashcards') renderFlashcard();
+  if (id === 'path') renderPath();
+  if (id === 'ref') renderGlossary();
+  if (id === 'print') initPrint();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════════════════════════ */
+function renderOverview() {
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = CHAPTERS.map(c => `
+    <div class="chapter-card ${state.doneChapters.has(c.num) ? 'done' : ''}" onclick="goToChapter('${c.num}')">
+      <div class="chapter-num">${c.num}</div>
+      <div class="chapter-info">
+        <div class="title">${c.title}</div>
+        <div class="sub">${c.sub}</div>
+      </div>
+      <div class="chapter-done">✓</div>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function goToChapter(num) {
+  // Switch to flashcards filtered by that chapter
+  state.fcFilter = CHAPTERS.find(c => c.num === num)?.sub.split(',')[0]?.trim() || 'all';
+  // Actually filter by chapter title keyword
+  const ch = CHAPTERS.find(c => c.num === num);
+  if (ch) {
+    const keywords = ch.title.split(/[\s&,]+/).filter(w => w.length > 3);
+    // find matching flashcard category
+    const cats = [...new Set(FLASHCARDS.map(f => f.cat))];
+    const match = cats.find(cat => keywords.some(k => cat.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(cat.toLowerCase())));
+    if (match) { applyFcFilter(match); }
+    else { applyFcFilter('all'); }
+  }
+  showPageById('flashcards');
+}
+function showPageById(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => { if (t.textContent.trim().toLowerCase().includes(id.substring(0,4))) t.classList.add('active'); else t.classList.remove('active'); });
+  document.getElementById('page-'+id).classList.add('active');
+  if (id === 'flashcards') renderFlashcard();
+}
+
+function updateProgress() {
+  const pct = Math.round((state.knownCards.size / FLASHCARDS.length) * 100);
+  const circumference = 82;
+  const offset = circumference - (pct / 100) * circumference;
+  document.getElementById('progressRing').style.strokeDashoffset = offset;
+  document.getElementById('progressLabel').textContent = pct + '%';
+  document.getElementById('statKnown').textContent = state.knownCards.size;
+  // update chapter cards
+  document.querySelectorAll('.chapter-card').forEach((el, i) => {
+    el.classList.toggle('done', state.doneChapters.has(CHAPTERS[i].num));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FLASHCARDS
+═══════════════════════════════════════════════════════════ */
+function renderFcFilters() {
+  const cats = ['all', ...new Set(FLASHCARDS.map(f => f.cat))];
+  document.getElementById('fcFilter').innerHTML = cats.map(c => `
+    <button class="filter-btn ${c === 'all' ? 'active' : ''}" onclick="applyFcFilter('${c}')">${c === 'all' ? 'Alle' : c}</button>
+  `).join('');
+}
+
+function applyFcFilter(cat) {
+  state.fcFilter = cat;
+  state.fcFiltered = cat === 'all' ? [...FLASHCARDS] : FLASHCARDS.filter(f => f.cat === cat);
+  state.fcIndex = 0;
+  state.fcFlipped = false;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === (cat === 'all' ? 'Alle' : cat));
+  });
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  const cards = state.fcFiltered;
+  if (!cards.length) return;
+  const idx = state.fcIndex;
+  const card = cards[idx];
+  const key = cardKey(card);
+  const fach = state.leitnerBox[key] || 1;
+
+  document.getElementById('fcCategory').textContent = card.cat;
+  document.getElementById('fcQuestion').textContent = card.q;
+  document.getElementById('fcAnswer').innerHTML = card.a;
+  document.getElementById('cardCounter').textContent = `Karte ${idx+1} von ${cards.length}`;
+  document.getElementById('fcProgressFill').style.width = ((idx+1)/cards.length*100) + '%';
+  document.getElementById('fcKnown').textContent = state.knownCards.size;
+  document.getElementById('fcTotal').textContent = FLASHCARDS.length;
+
+  // Leitner dots
+  const dotColors = ['','l1','l2','l3','l4','l5'];
+  const dotLabels = ['','Fach 1 – Neu','Fach 2','Fach 3','Fach 4','Fach 5 – Gelernt'];
+  document.getElementById('leitnerDots').innerHTML =
+    [1,2,3,4,5].map(n => `<div class="l-dot ${n <= fach ? dotColors[fach] : ''}"></div>`).join('');
+  document.getElementById('leitnerLabel').textContent = dotLabels[fach];
+
+  // Leitner box counts
+  const counts = {1:0,2:0,3:0,4:0,5:0};
+  FLASHCARDS.forEach(c => { const f = state.leitnerBox[cardKey(c)] || 1; counts[f]++; });
+  [1,2,3,4,5].forEach(n => { document.getElementById('lbn'+n).textContent = counts[n]; });
+
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  state.fcFlipped = false;
+}
+
+function flipCard() {
+  state.fcFlipped = !state.fcFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', state.fcFlipped);
+}
+
+function fcNav(dir) {
+  const cards = state.fcFiltered;
+  state.fcIndex = (state.fcIndex + dir + cards.length) % cards.length;
+  state.fcFlipped = false;
+  renderFlashcard();
+}
+
+function markKnown() {
+  const card = state.fcFiltered[state.fcIndex];
+  const key = cardKey(card);
+  const cur = state.leitnerBox[key] || 1;
+  // advance fach (max 5)
+  state.leitnerBox[key] = Math.min(cur + 1, 5);
+  if (state.leitnerBox[key] === 5) {
+    state.knownCards.add(key);
+    showToast('🎉 Fach 5 – vollständig gelernt!', 'success');
+  } else {
+    showToast(`✓ Gewusst – jetzt in Fach ${state.leitnerBox[key]}`, 'success');
+  }
+  saveState();
+  updateProgress();
+  fcNav(1);
+}
+
+function markNope() {
+  const card = state.fcFiltered[state.fcIndex];
+  const key = cardKey(card);
+  // reset to fach 1
+  state.leitnerBox[key] = 1;
+  state.knownCards.delete(key);
+  showToast('✗ Zurück in Fach 1', 'error');
+  saveState();
+  updateProgress();
+  fcNav(1);
+}
+
+function shuffleCards() {
+  for (let i = state.fcFiltered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [state.fcFiltered[i], state.fcFiltered[j]] = [state.fcFiltered[j], state.fcFiltered[i]];
+  }
+  state.fcIndex = 0;
+  renderFlashcard();
+  showToast('⇄ Karten gemischt');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════════════════════ */
+function generateQuiz() {
+  state.errorMode = false;
+  document.getElementById('scorePanel').classList.remove('show');
+  state.quizAnswers = {};
+  state.quizChecked = {};
+
+  const topic = document.getElementById('quizTopic').value;
+  const type  = document.getElementById('quizType').value;
+  const countVal = document.getElementById('quizCount').value;
+
+  let pool = QUESTIONS;
+  if (topic !== 'all') pool = pool.filter(q => q.topic === topic);
+  if (type  !== 'all') pool = pool.filter(q => q.type  === type);
+
+  pool = [...pool].sort(() => Math.random() - 0.5);
+  const count = countVal === 'all' ? pool.length : Math.min(parseInt(countVal), pool.length);
+  state.quizItems = pool.slice(0, count);
+
+  const container = document.getElementById('quizContainer');
+  if (!state.quizItems.length) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Keine Aufgaben für diese Kombination gefunden.</p>';
+    return;
+  }
+
+  container.innerHTML = state.quizItems.map((q, i) => renderQuestion(q, i)).join('') +
+    `<div style="text-align:center;margin-top:24px">
+      <button class="btn-generate" onclick="submitQuiz()">Auswerten →</button>
+    </div>`;
+}
+
+function loadErrorStack() {
+  if (!state.errorStack.length) {
+    showToast('Kein Fehler-Stapel vorhanden – erst eine Quiz-Runde absolvieren!');
+    return;
+  }
+  state.errorMode = true;
+  document.getElementById('scorePanel').classList.remove('show');
+  state.quizAnswers = {};
+  state.quizChecked = {};
+  state.quizItems = state.errorStack;
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = state.quizItems.map((q, i) => renderQuestion(q, i)).join('') +
+    `<div style="text-align:center;margin-top:24px">
+      <button class="btn-generate" onclick="submitQuiz()">Fehler auswerten →</button>
+    </div>`;
+  container.scrollIntoView({ behavior:'smooth' });
+  showToast(`📋 Fehler-Stapel: ${state.quizItems.length} Aufgaben`);
+}
+
+function renderQuestion(q, i) {
+  const badges = { mc:'badge-mc', tf:'badge-tf', fill:'badge-fill', subnet:'badge-subnet' };
+  const typeLabels = { mc:'Multiple Choice', tf:'Wahr / Falsch', fill:'Lückentext', subnet:'Subnetting' };
+  const diffStars = '★'.repeat(q.diff) + '☆'.repeat(3-q.diff);
+
+  let inputHtml = '';
+  if (q.type === 'mc') {
+    inputHtml = `<div class="q-options">${q.opts.map((o, oi) =>
+      `<div class="q-option" id="opt_${i}_${oi}" onclick="selectOption(${i},${oi})">
+        <span class="opt-letter">${'ABCD'[oi]}</span>${o}
+      </div>`).join('')}</div>`;
+  } else if (q.type === 'tf') {
+    inputHtml = `<div class="q-options">
+      <div class="q-option" id="opt_${i}_true" onclick="selectTF(${i}, true)"><span class="opt-letter">T</span>Richtig</div>
+      <div class="q-option" id="opt_${i}_false" onclick="selectTF(${i}, false)"><span class="opt-letter">F</span>Falsch</div>
+    </div>`;
+  } else {
+    inputHtml = `<input class="q-input" type="text" id="inp_${i}" placeholder="Deine Antwort…" oninput="state.quizAnswers[${i}]=this.value">`;
+  }
+
+  return `
+    <div class="quiz-question" id="question_${i}">
+      <div class="q-meta">
+        <span class="q-type-badge ${badges[q.type]}">${typeLabels[q.type]}</span>
+        <span class="q-diff">${diffStars}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      ${inputHtml}
+      <div class="q-explanation" id="exp_${i}"><strong>Erklärung:</strong> ${q.exp}</div>
+    </div>`;
+}
+
+function selectOption(qi, oi) {
+  if (state.quizChecked[qi]) return;
+  state.quizAnswers[qi] = oi;
+  document.querySelectorAll(`[id^="opt_${qi}_"]`).forEach(el => el.classList.remove('correct','wrong','disabled'));
+  document.getElementById(`opt_${qi}_${oi}`).classList.add('correct');
+}
+
+function selectTF(qi, val) {
+  if (state.quizChecked[qi]) return;
+  state.quizAnswers[qi] = val;
+  ['true','false'].forEach(v => {
+    const el = document.getElementById(`opt_${qi}_${v}`);
+    if (el) el.classList.remove('correct','wrong');
+  });
+  document.getElementById(`opt_${qi}_${val}`).classList.add('correct');
+}
+
+function submitQuiz() {
+  let correct = 0;
+  const wrongItems = [];
+  state.quizItems.forEach((q, i) => {
+    const ans = state.quizAnswers[i];
+    let isCorrect = false;
+
+    if (q.type === 'mc') {
+      isCorrect = ans === q.correct;
+      document.querySelectorAll(`[id^="opt_${i}_"]`).forEach((el, oi) => {
+        el.classList.remove('correct','wrong');
+        el.classList.add('disabled');
+        if (oi === q.correct) el.classList.add('correct');
+        else if (oi === ans && !isCorrect) el.classList.add('wrong');
+      });
+    } else if (q.type === 'tf') {
+      isCorrect = ans === q.correct;
+      ['true','false'].forEach(v => {
+        const el = document.getElementById(`opt_${i}_${v}`);
+        if (!el) return;
+        el.classList.remove('correct','wrong');
+        el.classList.add('disabled');
+        const bval = v === 'true';
+        if (bval === q.correct) el.classList.add('correct');
+        else if (bval === ans && !isCorrect) el.classList.add('wrong');
+      });
+    } else {
+      const inp = document.getElementById(`inp_${i}`);
+      const userAns = (ans || '').toString().trim().toLowerCase();
+      const correctAns = q.answer.toString().trim().toLowerCase();
+      isCorrect = userAns === correctAns || userAns.replace(/\s/g,'') === correctAns.replace(/\s/g,'');
+      if (inp) {
+        inp.classList.add(isCorrect ? 'correct' : 'wrong');
+        inp.disabled = true;
+        if (!isCorrect) inp.value = inp.value + ' → Richtig: ' + q.answer;
+      }
+    }
+
+    if (isCorrect) correct++;
+    else wrongItems.push(q);
+    state.quizChecked[i] = true;
+    document.getElementById(`exp_${i}`).classList.add('show');
+  });
+
+  // Save error stack
+  if (!state.errorMode) {
+    state.errorStack = wrongItems;
+    saveState();
+  }
+
+  const total = state.quizItems.length;
+  const pct = Math.round((correct/total)*100);
+  const panel = document.getElementById('scorePanel');
+  const big = document.getElementById('scoreBig');
+  big.textContent = `${correct}/${total}`;
+  big.className = 'score-big ' + (pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'poor');
+  document.getElementById('scoreMsg').textContent =
+    pct >= 80 ? '🎉 Ausgezeichnet! Du beherrschst dieses Thema.' :
+    pct >= 50 ? '👍 Gut! Noch ein bisschen üben.' :
+    '📚 Wiederholen – schau dir die Karteikarten nochmal an.';
+
+  // Show/hide retry-errors button
+  const btnErr = document.getElementById('btnRetryErrors');
+  if (wrongItems.length > 0 && !state.errorMode) {
+    btnErr.style.display = 'inline-block';
+    btnErr.textContent = `✗ ${wrongItems.length} Fehler wiederholen`;
+    // Show banner for next visit
+    document.getElementById('errorCount').textContent = wrongItems.length;
+    document.getElementById('errorBanner').style.display = 'flex';
+  } else {
+    btnErr.style.display = 'none';
+    if (state.errorMode) {
+      document.getElementById('errorBanner').style.display = 'none';
+    }
+  }
+
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LERNPFAD
+═══════════════════════════════════════════════════════════ */
+function renderPath() {
+  const container = document.getElementById('pathSteps');
+  container.innerHTML = PATH_STEPS.map((step, i) => {
+    const done = state.doneSteps.has(i);
+    const active = !done && (i === 0 || state.doneSteps.has(i-1));
+    return `
+      <div class="path-step ${done ? 'done' : ''} ${active ? 'active' : ''}">
+        <div class="step-node" onclick="toggleStep(${i})">${done ? '✓' : i+1}</div>
+        <div class="step-content">
+          <div class="step-label">${step.label}</div>
+          <div class="step-title">${step.title}</div>
+          <div class="step-desc">${step.desc}</div>
+          <div class="step-tags">${step.tags.map(t => `<span class="step-tag">${t}</span>`).join('')}</div>
+          <a class="step-action" onclick="goToChapter('${step.ch}')">
+            ${done ? '↩ Nochmal üben' : '→ Karteikarten öffnen'}
+          </a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleStep(i) {
+  if (state.doneSteps.has(i)) state.doneSteps.delete(i);
+  else state.doneSteps.add(i);
+  saveState();
+  // also mark corresponding chapter
+  const ch = PATH_STEPS[i].ch;
+  if (state.doneSteps.has(i)) state.doneChapters.add(ch);
+  updateProgress();
+  renderPath();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOSSAR
+═══════════════════════════════════════════════════════════ */
+function renderGlossary(filter='') {
+  const grid = document.getElementById('refGrid');
+  const filtered = filter
+    ? GLOSSARY.filter(g => g.term.toLowerCase().includes(filter.toLowerCase()) || g.def.toLowerCase().includes(filter.toLowerCase()) || g.tag.toLowerCase().includes(filter.toLowerCase()))
+    : GLOSSARY;
+  const sorted = [...filtered].sort((a,b) => a.term.localeCompare(b.term));
+  grid.innerHTML = sorted.map(g => `
+    <div class="ref-card">
+      <div class="ref-term">${g.term}</div>
+      <div class="ref-def">${g.def}</div>
+      <span class="ref-tag">${g.tag}</span>
+    </div>
+  `).join('');
+}
+
+function filterGlossary(val) { renderGlossary(val); }
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DRUCKMODUS
+═══════════════════════════════════════════════════════════ */
+function initPrint() {
+  // Populate category select
+  const cats = ['all', ...new Set(FLASHCARDS.map(f => f.cat))];
+  const sel = document.getElementById('printCat');
+  sel.innerHTML = cats.map(c =>
+    `<option value="${c}">${c === 'all' ? 'Alle Kategorien' : c}</option>`
+  ).join('');
+  renderPrintPreview();
+}
+
+function renderPrintPreview() {
+  const cat    = document.getElementById('printCat').value;
+  const showAns = document.getElementById('printAns').value === '1';
+  const filter  = document.getElementById('printFilter').value;
+
+  let cards = cat === 'all' ? FLASHCARDS : FLASHCARDS.filter(c => c.cat === cat);
+
+  if (filter === 'weak') {
+    cards = cards.filter(c => {
+      const f = state.leitnerBox[cardKey(c)] || 1;
+      return f <= 2;
+    });
+  }
+
+  document.getElementById('printLabel').textContent =
+    `${cards.length} Karte${cards.length !== 1 ? 'n' : ''} ausgewählt`;
+
+  document.getElementById('printGrid').innerHTML = cards.map(c => `
+    <div class="print-card">
+      <div class="p-cat">${c.cat}</div>
+      <div class="p-q">${c.q}</div>
+      ${showAns ? `<hr class="p-sep"><div class="p-a">${c.a.replace(/<[^>]+>/g,'')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+loadState();
+renderOverview();
+renderFcFilters();
+applyFcFilter('all');
+renderGlossary();
+generateQuiz();
+// Restore error banner if stack exists
+if (state.errorStack.length > 0) {
+  document.getElementById('errorCount').textContent = state.errorStack.length;
+  document.getElementById('errorBanner').style.display = 'flex';
+}
+</script>
+</body>
+</html>
